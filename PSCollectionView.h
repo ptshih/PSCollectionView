@@ -10,37 +10,48 @@
 
 @protocol PSCollectionViewDelegate, PSCollectionViewDataSource;
 
-@interface PSCollectionView : UIScrollView <NSCoding, UIGestureRecognizerDelegate>
+@interface PSCollectionView : UIScrollView
+
+#pragma mark - Public Properties
 
 @property (nonatomic, retain) UIView *headerView;
 @property (nonatomic, retain) UIView *footerView;
 @property (nonatomic, retain) UIView *emptyView;
-@property (nonatomic, retain) NSMutableSet *reuseableViews;
-@property (nonatomic, retain) NSMutableDictionary *visibleViews;
-@property (nonatomic, retain) NSMutableArray *viewKeysToRemove;
-@property (nonatomic, retain) NSMutableDictionary *indexToRectMap;
+@property (nonatomic, retain) UIView *loadingView;
+
+@property (nonatomic, assign, readonly) CGFloat colWidth;
+@property (nonatomic, assign, readonly) NSInteger numCols;
 @property (nonatomic, assign) NSInteger numColsLandscape;
 @property (nonatomic, assign) NSInteger numColsPortrait;
-@property (nonatomic, assign) CGFloat colWidth;
 @property (nonatomic, assign) id <PSCollectionViewDelegate> collectionViewDelegate;
 @property (nonatomic, assign) id <PSCollectionViewDataSource> collectionViewDataSource;
 
-#pragma mark - DataSource
-- (void)reloadViews;
+#pragma mark - Public Methods
 
-#pragma mark - Reusing Views
+/**
+ Reloads the collection view
+ This is similar to UITableView reloadData)
+ */
+- (void)reloadData;
+
+/**
+ Dequeues a reusable view that was previously initialized
+ This is similar to UITableView dequeueReusableCellWithIdentifier
+ */
 - (UIView *)dequeueReusableView;
-- (void)enqueueReusableView:(UIView *)view;
-- (void)removeAndAddCellsIfNecessary;
 
 @end
 
+#pragma mark - Delegate
 
 @protocol PSCollectionViewDelegate <NSObject>
+
 @optional
 - (void)collectionView:(PSCollectionView *)collectionView didSelectView:(UIView *)view atIndex:(NSInteger)index;
 
 @end
+
+#pragma mark - DataSource
 
 @protocol PSCollectionViewDataSource <NSObject>
 

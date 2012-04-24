@@ -27,70 +27,95 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 @end
 
 
-@interface PSCollectionView ()
+@interface PSCollectionView () <UIGestureRecognizerDelegate>
 
-@property (nonatomic, retain) UIView *loadingView;
-@property (nonatomic, assign) NSInteger numCols;
+@property (nonatomic, assign, readwrite) CGFloat colWidth;
+@property (nonatomic, assign, readwrite) NSInteger numCols;
 @property (nonatomic, assign) UIInterfaceOrientation orientation;
 
+@property (nonatomic, retain) NSMutableSet *reuseableViews;
+@property (nonatomic, retain) NSMutableDictionary *visibleViews;
+@property (nonatomic, retain) NSMutableArray *viewKeysToRemove;
+@property (nonatomic, retain) NSMutableDictionary *indexToRectMap;
+
+
+/**
+ Forces a relayout of the collection grid
+ */
 - (void)relayoutViews;
+
+/**
+ Stores a view for later reuse
+ TODO: add an identifier like UITableView
+ */
+- (void)enqueueReusableView:(UIView *)view;
+
+/**
+ Magic!
+ */
+- (void)removeAndAddCellsIfNecessary;
 
 @end
 
 @implementation PSCollectionView
 
+// Public Views
 @synthesize
-loadingView = _loadingView,
-orientation = _orientation,
 headerView = _headerView,
 footerView = _footerView,
 emptyView = _emptyView,
+loadingView = _loadingView;
+
+// Public
+@synthesize
+colWidth = _colWidth,
+numCols = _numCols,
+numColsLandscape = _numColsLandscape,
+numColsPortrait = _numColsPortrait,
+collectionViewDelegate = _collectionViewDelegate,
+collectionViewDataSource = _collectionViewDataSource;
+
+// Private
+@synthesize
+orientation = _orientation,
 reuseableViews = _reuseableViews,
 visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
-indexToRectMap = _indexToRectMap,
-numCols = _numCols,
-numColsPortrait = _numColsPortrait,
-numColsLandscape = _numColsLandscape,
-colWidth = _colWidth,
-collectionViewDelegate = _collectionViewDelegate,
-collectionViewDataSource = _collectionViewDataSource;
+indexToRectMap = _indexToRectMap;
+
+#pragma mark - Init/Memory
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.alwaysBounceVertical = YES;
+        
+        self.colWidth = 0.0;
+        self.numCols = 0;
+        self.numColsPortrait = 0;
+        self.numColsLandscape = 0;
+        self.orientation = [UIApplication sharedApplication].statusBarOrientation;
+        
         self.reuseableViews = [NSMutableSet set];
         self.visibleViews = [NSMutableDictionary dictionary];
         self.viewKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
-        self.numCols = 0;
-        self.numColsPortrait = 0;
-        self.numColsLandscape = 0;
-        self.colWidth = 0.0;
-        self.alwaysBounceVertical = YES;
-        self.orientation = [UIApplication sharedApplication].statusBarOrientation;
-        
-//        [self addObserver:self forKeyPath:@"contentOffset" options:0 context:nil];
-        self.loadingView = [UILabel labelWithText:@"Loading..." style:@"emptyLabel"];
-        self.loadingView.frame = self.bounds;
-        self.loadingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        [self addSubview:self.loadingView];
     }
     return self;
 }
 
 - (void)dealloc {
-//    [self removeObserver:self forKeyPath:@"contentOffset"];
-    
     // clear delegates
+    self.delegate = nil;
     self.collectionViewDataSource = nil;
     self.collectionViewDelegate = nil;
     
     // release retains
-    self.loadingView = nil;
     self.headerView = nil;
     self.footerView = nil;
     self.emptyView = nil;
+    self.loadingView = nil;
+    
     self.reuseableViews = nil;
     self.visibleViews = nil;
     self.viewKeysToRemove = nil;
@@ -98,14 +123,26 @@ collectionViewDataSource = _collectionViewDataSource;
     [super dealloc];
 }
 
-#pragma mark - KVO
-//- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-//    if ([object isEqual:self]) {
-//        [self removeAndAddCellsIfNecessary];
-//    }
-//}
+#pragma mark - Setters
+
+- (void)setLoadingView:(UIView *)loadingView {
+    if (_loadingView && [_loadingView respondsToSelector:@selector(removeFromSuperview)]) {
+        [_loadingView removeFromSuperview];
+    }
+    [_loadingView release], _loadingView = nil;
+    _loadingView = [loadingView retain];
+    
+    [self addSubview:_loadingView];
+}
+
+#pragma mark - DataSource
+
+- (void)reloadData {
+    [self relayoutViews];
+}
 
 #pragma mark - View
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     
@@ -116,6 +153,113 @@ collectionViewDataSource = _collectionViewDataSource;
     } else {
         [self removeAndAddCellsIfNecessary];
     }
+}
+
+- (void)relayoutViews {
+    self.numCols = UIInterfaceOrientationIsPortrait(self.orientation) ? self.numColsPortrait : self.numColsLandscape;
+    
+    // Reset all state
+    [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        UIView *view = (UIView *)obj;
+        [self enqueueReusableView:view];
+    }];
+    [self.visibleViews removeAllObjects];
+    [self.viewKeysToRemove removeAllObjects];
+    [self.indexToRectMap removeAllObjects];
+    
+    if (self.emptyView) {
+        [self.emptyView removeFromSuperview];
+    }
+    [self.loadingView removeFromSuperview];
+    
+    // This is where we should layout the entire grid first
+    NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
+    
+    CGFloat totalHeight = 0.0;
+    CGFloat top = kMargin;
+    
+    // Add headerView if it exists
+    if (self.headerView) {
+        self.headerView.top = kMargin;
+        top = self.headerView.top;
+        [self addSubview:self.headerView];
+        top += self.headerView.height;
+        top += kMargin;
+    }
+    
+    if (numViews > 0) {
+        // This array determines the last height offset on a column
+        NSMutableArray *colOffsets = [NSMutableArray arrayWithCapacity:self.numCols];
+        for (int i = 0; i < self.numCols; i++) {
+            [colOffsets addObject:[NSNumber numberWithFloat:top]];
+        }
+        
+        // Calculate index to rect mapping
+        self.colWidth = floorf((self.width - kMargin * (self.numCols + 1)) / self.numCols);
+        for (NSInteger i = 0; i < numViews; i++) {
+            NSString *key = PSCollectionKeyForIndex(i);
+            
+            // Find the shortest column
+            NSInteger col = 0;
+            CGFloat minHeight = [[colOffsets objectAtIndex:col] floatValue];
+            for (int i = 1; i < [colOffsets count]; i++) {
+                CGFloat colHeight = [[colOffsets objectAtIndex:i] floatValue];
+                
+                if (colHeight < minHeight) {
+                    col = i;
+                    minHeight = colHeight;
+                }
+            }
+            
+            CGFloat left = kMargin + (col * kMargin) + (col * self.colWidth);
+            CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
+            CGFloat colHeight = [self.collectionViewDataSource heightForViewAtIndex:i];
+            if (colHeight == 0) {
+                colHeight = self.colWidth;
+            }
+            
+            if (top != top) {
+                // NaN
+            }
+            
+            CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
+            
+            // Add to index rect map
+            [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
+            
+            // Update the last height offset for this column
+            CGFloat test = top + colHeight + kMargin;
+            
+            if (test != test) {
+                // NaN
+            }
+            [colOffsets replaceObjectAtIndex:col withObject:[NSNumber numberWithFloat:test]];
+        }
+        
+        for (NSNumber *colHeight in colOffsets) {
+            totalHeight = (totalHeight < [colHeight floatValue]) ? [colHeight floatValue] : totalHeight;
+        }
+    } else {
+        totalHeight = self.height;
+        
+        // If we have an empty view, show it
+        if (self.emptyView) {
+            self.emptyView.frame = CGRectMake(kMargin, top, self.width - kMargin * 2, self.height - top - kMargin);
+            [self addSubview:self.emptyView];
+        }
+    }
+    
+    // Add footerView if exists
+    if (self.footerView) {
+        self.footerView.top = totalHeight;
+        [self addSubview:self.footerView];
+        totalHeight += self.footerView.height;
+        totalHeight += kMargin;
+    }
+    
+    self.contentSize = CGSizeMake(self.width, totalHeight);
+    
+    [self removeAndAddCellsIfNecessary];
 }
 
 - (void)removeAndAddCellsIfNecessary {
@@ -162,7 +306,7 @@ collectionViewDataSource = _collectionViewDataSource;
         topIndex = MAX(0, topIndex - (bufferViewFactor * self.numCols));
         bottomIndex = MIN(numViews, bottomIndex + (bufferViewFactor * self.numCols));
     }
-//    NSLog(@"topIndex: %d, bottomIndex: %d", topIndex, bottomIndex);
+    //    NSLog(@"topIndex: %d, bottomIndex: %d", topIndex, bottomIndex);
     
     // Add views
     for (NSInteger i = topIndex; i < bottomIndex; i++) {
@@ -189,116 +333,8 @@ collectionViewDataSource = _collectionViewDataSource;
     }
 }
 
-- (void)relayoutViews {
-    self.numCols = UIInterfaceOrientationIsPortrait(self.orientation) ? self.numColsPortrait : self.numColsLandscape;
-    
-    // Reset all state
-    [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        UIView *view = (UIView *)obj;
-        [self enqueueReusableView:view];
-    }];
-    [self.visibleViews removeAllObjects];
-    [self.viewKeysToRemove removeAllObjects];
-    [self.indexToRectMap removeAllObjects];
-    
-    if (self.emptyView) {
-        [self.emptyView removeFromSuperview];
-    }
-    [self.loadingView removeFromSuperview];
-    
-    // This is where we should layout the entire grid first
-    NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
-    
-    CGFloat totalHeight = 0.0;
-    CGFloat top = kMargin;
-    
-    // Add headerView if it exists
-    if (self.headerView) {
-        [self addSubview:self.headerView];
-        top = self.headerView.height;
-    }
-    
-    if (numViews > 0) {
-        // This array determines the last height offset on a column
-        NSMutableArray *colOffsets = [NSMutableArray arrayWithCapacity:self.numCols];
-        for (int i = 0; i < self.numCols; i++) {
-            [colOffsets addObject:[NSNumber numberWithFloat:top]];
-        }
-        
-        // Calculate index to rect mapping
-        self.colWidth = floorf((self.width - kMargin * (self.numCols + 1)) / self.numCols);
-        for (NSInteger i = 0; i < numViews; i++) {
-            NSString *key = PSCollectionKeyForIndex(i);
-            
-            // Find the shortest column
-            NSInteger col = 0;
-            CGFloat minHeight = [[colOffsets objectAtIndex:col] floatValue];
-            for (int i = 1; i < [colOffsets count]; i++) {
-                CGFloat colHeight = [[colOffsets objectAtIndex:i] floatValue];
-                
-                if (colHeight < minHeight) {
-                    col = i;
-                    minHeight = colHeight;
-                }
-            }
-            
-            CGFloat left = kMargin + (col * kMargin) + (col * self.colWidth);
-            CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
-            CGFloat colHeight = [self.collectionViewDataSource heightForViewAtIndex:i];
-            if (colHeight == 0) {
-                colHeight = self.colWidth;
-            }
-            
-            if (top != top) {
-                NSLog(@"nan");
-            }
-            
-            CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
-            
-            // Add to index rect map
-            [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
-            
-            // Update the last height offset for this column
-            CGFloat test = top + colHeight + kMargin;
-            
-            if (test != test) {
-                NSLog(@"nan");
-            }
-            [colOffsets replaceObjectAtIndex:col withObject:[NSNumber numberWithFloat:test]];
-        }
-        
-        for (NSNumber *colHeight in colOffsets) {
-            totalHeight = (totalHeight < [colHeight floatValue]) ? [colHeight floatValue] : totalHeight;
-        }
-    } else {
-        totalHeight = self.height;
-        
-        // If we have an empty view, show it
-        if (self.emptyView) {
-            self.emptyView.frame = CGRectMake(kMargin, top, self.width - kMargin * 2, self.height - kMargin * 2);
-            [self addSubview:self.emptyView];
-        }
-    }
-    
-    // Add footerView if exists
-    if (self.footerView) {
-        self.footerView.top = totalHeight;
-        [self addSubview:self.footerView];
-        totalHeight += self.footerView.height;
-    }
-    
-    self.contentSize = CGSizeMake(self.width, totalHeight);
-    //    self.contentOffset = CGPointZero;
-    
-    [self removeAndAddCellsIfNecessary];
-}
-
-#pragma mark - DataSource
-- (void)reloadViews {
-    [self relayoutViews];
-}
-
 #pragma mark - Reusing Views
+
 - (UIView *)dequeueReusableView {
     UIView *view = [self.reuseableViews anyObject];
     if (view) {
@@ -321,6 +357,7 @@ collectionViewDataSource = _collectionViewDataSource;
 }
 
 #pragma mark - Gesture Recognizer
+
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {    
     NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
