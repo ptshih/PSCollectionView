@@ -18,7 +18,7 @@ Here's an example of creating an instance of PSCollectionView
     self.collectionView.delegate = self;
     self.collectionView.collectionViewDelegate = self;
     self.collectionView.collectionViewDataSource = self;
-    self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth |     UIViewAutoresizingFlexibleHeight;
+    self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
 **Setting number of columns**
 
