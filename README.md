@@ -5,14 +5,41 @@ It's a Pinterest style scroll view that resembles familiar paradigms from UITabl
 How does it work?
 ---
 
-`self.collectionView = [[[PSCollectionView alloc] initWithFrame:self.view.bounds] autorelease];`
+Here's an example of creating an instance of PSCollectionView
 
-`self.collectionView.delegate = self;`
+    self.collectionView = [[[PSCollectionView alloc] initWithFrame:self.view.bounds] autorelease];
+    self.collectionView.delegate = self;
+    self.collectionView.collectionViewDelegate = self;
+    self.collectionView.collectionViewDataSource = self;
+    self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth |     UIViewAutoresizingFlexibleHeight;
 
-`self.collectionView.collectionViewDelegate = self;`
+**Setting number of columns**
 
-`self.collectionView.collectionViewDataSource = self;`
+    // Optionally specify number of columns for both iPhone and iPad
+    if (isDeviceIPad()) {
+        self.collectionView.numColsPortrait = 4;
+        self.collectionView.numColsLandscape = 5;
+    } else {
+        self.collectionView.numColsPortrait = 2;
+        self.collectionView.numColsLandscape = 3;
+    }
 
-`self.collectionView.backgroundColor = [UIColor clearColor];`
+**Add a loading view or label**
 
-`self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;`
+    UIView *loadingLabel = ...
+    self.collectionView.loadingView = loadingLabel;
+
+**Add an empty/error view or label**
+
+    UIView *emptyView = ...
+    self.collectionView.emptyView = emptyView;
+
+**Add a header view**
+
+    UIView *headerView = ...
+    self.collectionView.headerView = headerView;
+
+**Add a footer view**
+
+    UIView *footerView = ...
+    self.collectionView.footerView = footerView;
