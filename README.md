@@ -1,10 +1,12 @@
 What is PSCollectionView?
 ---
-It's a Pinterest style scroll view designed to be very similar to UITableView.
+It's a Pinterest style scroll view designed to be used similar to a UITableView.
 
 It supports Portrait and Landscape orientations.
 
-I built this as a hack, and it will always be a hack. Use at your own risk.
+I built this as a hack to show my friends. Any suggestions or improvements are very welcome!
+
+Coming soon... A fully functional demo app.
 
 What is PSCollectionViewCell?
 ---
@@ -34,7 +36,7 @@ Here's an example of creating an instance of PSCollectionView
 
 **Setting number of columns**
 
-    // Optionally specify number of columns for both iPhone and iPad
+    // Specify number of columns for both iPhone and iPad
     if (isDeviceIPad()) {
         self.collectionView.numColsPortrait = 4;
         self.collectionView.numColsLandscape = 5;
