@@ -1,10 +1,11 @@
 What is PSCollectionView?
 ---
-It's a Pinterest style scroll view that resembles familiar paradigms from UITableView.
+It's a Pinterest style scroll view designed to be very similar to UITableView.
 
 What is PSCollectionViewCell?
 ---
 It's the equivalent to UITableViewCell
+
 It implements base methods for configuring with data and calculating height
 
 *Note: You should subclass this!*
