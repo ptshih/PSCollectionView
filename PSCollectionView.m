@@ -447,7 +447,7 @@ indexToRectMap = _indexToRectMap;
     if ([gestureRecognizer.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
         if (self.collectionViewDelegate && [self.collectionViewDelegate respondsToSelector:@selector(collectionView:didSelectView:atIndex:)]) {
             NSInteger matchingIndex = PSCollectionIndexForKey([matchingKeys lastObject]);
-            [self.collectionViewDelegate collectionView:self didSelectView:gestureRecognizer.view atIndex:matchingIndex];
+            [self.collectionViewDelegate collectionView:self didSelectView:(PSCollectionViewCell *)gestureRecognizer.view atIndex:matchingIndex];
         }
     }
 }
