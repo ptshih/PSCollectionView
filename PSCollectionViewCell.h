@@ -1,5 +1,5 @@
 //
-//  PSCollectionViewCell.h
+// PSCollectionViewCell.h
 //
 // Copyright (c) 2012 Peter Shih (http://petershih.com)
 // 
