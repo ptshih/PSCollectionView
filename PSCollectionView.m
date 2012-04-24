@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 
 #import "PSCollectionView.h"
-#import "UIView+PSKit.h"
+#import "PSCollectionViewCell.h"
 
 #define kMargin 8.0
 
@@ -33,6 +33,73 @@ static inline NSString * PSCollectionKeyForIndex(NSInteger index) {
 static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     return [key integerValue];
 }
+
+#pragma mark - UIView Category
+
+@interface UIView (PSCollectionView)
+
+@property(nonatomic) CGFloat left;
+@property(nonatomic) CGFloat top;
+@property(nonatomic, readonly) CGFloat right;
+@property(nonatomic, readonly) CGFloat bottom;
+@property(nonatomic) CGFloat width;
+@property(nonatomic) CGFloat height;
+
+@end
+
+@implementation UIView (PSCollectionView)
+
+- (CGFloat)left {
+    return self.frame.origin.x;
+}
+
+- (void)setLeft:(CGFloat)x {
+    CGRect frame = self.frame;
+    frame.origin.x = x;
+    self.frame = frame;
+}
+
+- (CGFloat)top {
+    return self.frame.origin.y;
+}
+
+- (void)setTop:(CGFloat)y {
+    CGRect frame = self.frame;
+    frame.origin.y = y;
+    self.frame = frame;
+}
+
+- (CGFloat)right {
+    return self.frame.origin.x + self.frame.size.width;
+}
+
+- (CGFloat)bottom {
+    return self.frame.origin.y + self.frame.size.height;
+}
+
+- (CGFloat)width {
+    return self.frame.size.width;
+}
+
+- (void)setWidth:(CGFloat)width {
+    CGRect frame = self.frame;
+    frame.size.width = width;
+    self.frame = frame;
+}
+
+- (CGFloat)height {
+    return self.frame.size.height;
+}
+
+- (void)setHeight:(CGFloat)height {
+    CGRect frame = self.frame;
+    frame.size.height = height;
+    self.frame = frame;
+}
+
+@end
+
+#pragma mark - Gesture Recognizer
 
 // This is just so we know that we sent this tap gesture recognizer in the delegate
 @interface PSCollectionViewTapGestureRecognizer : UITapGestureRecognizer
@@ -63,7 +130,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
  Stores a view for later reuse
  TODO: add an identifier like UITableView
  */
-- (void)enqueueReusableView:(UIView *)view;
+- (void)enqueueReusableView:(PSCollectionViewCell *)view;
 
 /**
  Magic!
@@ -175,7 +242,7 @@ indexToRectMap = _indexToRectMap;
     
     // Reset all state
     [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        UIView *view = (UIView *)obj;
+        PSCollectionViewCell *view = (PSCollectionViewCell *)obj;
         [self enqueueReusableView:view];
     }];
     [self.visibleViews removeAllObjects];
@@ -291,7 +358,7 @@ indexToRectMap = _indexToRectMap;
     
     // Remove all rows that are not inside the visible rect
     [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        UIView *view = (UIView *)obj;
+        PSCollectionViewCell *view = (PSCollectionViewCell *)obj;
         CGRect viewRect = view.frame;
         if (!CGRectIntersectsRect(visibleRect, viewRect)) {
             [self enqueueReusableView:view];
@@ -331,7 +398,7 @@ indexToRectMap = _indexToRectMap;
         // If view is within visible rect and is not already shown
         if (![self.visibleViews objectForKey:key] && CGRectIntersectsRect(visibleRect, rect)) {
             // Only add views if not visible
-            UIView *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
+            PSCollectionViewCell *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
             newView.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
             [self addSubview:newView];
             
@@ -350,8 +417,8 @@ indexToRectMap = _indexToRectMap;
 
 #pragma mark - Reusing Views
 
-- (UIView *)dequeueReusableView {
-    UIView *view = [self.reuseableViews anyObject];
+- (PSCollectionViewCell *)dequeueReusableView {
+    PSCollectionViewCell *view = [self.reuseableViews anyObject];
     if (view) {
         // Found a reusable view, remove it from the set
         [view retain];
@@ -362,7 +429,7 @@ indexToRectMap = _indexToRectMap;
     return view;
 }
 
-- (void)enqueueReusableView:(UIView *)view {
+- (void)enqueueReusableView:(PSCollectionViewCell *)view {
     if ([view respondsToSelector:@selector(prepareForReuse)]) {
         [view performSelector:@selector(prepareForReuse)];
     }

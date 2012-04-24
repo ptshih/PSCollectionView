@@ -23,6 +23,8 @@
 
 #import <UIKit/UIKit.h>
 
+@class PSCollectionViewCell;
+
 @protocol PSCollectionViewDelegate, PSCollectionViewDataSource;
 
 @interface PSCollectionView : UIScrollView
@@ -62,7 +64,7 @@
 @protocol PSCollectionViewDelegate <NSObject>
 
 @optional
-- (void)collectionView:(PSCollectionView *)collectionView didSelectView:(UIView *)view atIndex:(NSInteger)index;
+- (void)collectionView:(PSCollectionView *)collectionView didSelectView:(PSCollectionViewCell *)view atIndex:(NSInteger)index;
 
 @end
 
@@ -72,7 +74,7 @@
 
 @required
 - (NSInteger)numberOfViewsInCollectionView:(PSCollectionView *)collectionView;
-- (UIView *)collectionView:(PSCollectionView *)collectionView viewAtIndex:(NSInteger)index;
+- (PSCollectionViewCell *)collectionView:(PSCollectionView *)collectionView viewAtIndex:(NSInteger)index;
 - (CGFloat)heightForViewAtIndex:(NSInteger)index;
 
 @end
