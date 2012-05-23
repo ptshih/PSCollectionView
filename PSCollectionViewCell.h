@@ -25,7 +25,7 @@
 
 @interface PSCollectionViewCell : UIView
 
-@property (nonatomic, retain) id object;
+@property (nonatomic, strong) id object;
 
 - (void)prepareForReuse;
 - (void)fillViewWithObject:(id)object;
