@@ -31,17 +31,17 @@
 
 #pragma mark - Public Properties
 
-@property (nonatomic, retain) UIView *headerView;
-@property (nonatomic, retain) UIView *footerView;
-@property (nonatomic, retain) UIView *emptyView;
-@property (nonatomic, retain) UIView *loadingView;
+@property (nonatomic, strong) UIView *headerView;
+@property (nonatomic, strong) UIView *footerView;
+@property (nonatomic, strong) UIView *emptyView;
+@property (nonatomic, strong) UIView *loadingView;
 
 @property (nonatomic, assign, readonly) CGFloat colWidth;
 @property (nonatomic, assign, readonly) NSInteger numCols;
 @property (nonatomic, assign) NSInteger numColsLandscape;
 @property (nonatomic, assign) NSInteger numColsPortrait;
-@property (nonatomic, assign) id <PSCollectionViewDelegate> collectionViewDelegate;
-@property (nonatomic, assign) id <PSCollectionViewDataSource> collectionViewDataSource;
+@property (nonatomic, unsafe_unretained) id <PSCollectionViewDelegate> collectionViewDelegate;
+@property (nonatomic, unsafe_unretained) id <PSCollectionViewDataSource> collectionViewDataSource;
 
 #pragma mark - Public Methods
 
