@@ -38,12 +38,12 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @interface UIView (PSCollectionView)
 
-@property(nonatomic) CGFloat left;
-@property(nonatomic) CGFloat top;
-@property(nonatomic, readonly) CGFloat right;
-@property(nonatomic, readonly) CGFloat bottom;
-@property(nonatomic) CGFloat width;
-@property(nonatomic) CGFloat height;
+@property(nonatomic, assign) CGFloat left;
+@property(nonatomic, assign) CGFloat top;
+@property(nonatomic, assign, readonly) CGFloat right;
+@property(nonatomic, assign, readonly) CGFloat bottom;
+@property(nonatomic, assign) CGFloat width;
+@property(nonatomic, assign) CGFloat height;
 
 @end
 
