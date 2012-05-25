@@ -1,0 +1,320 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		28C66804156F3E60008E82CF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28C66803156F3E60008E82CF /* UIKit.framework */; };
+		28C66806156F3E60008E82CF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28C66805156F3E60008E82CF /* Foundation.framework */; };
+		28C66808156F3E60008E82CF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28C66807156F3E60008E82CF /* CoreGraphics.framework */; };
+		28C6680E156F3E60008E82CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 28C6680C156F3E60008E82CF /* InfoPlist.strings */; };
+		28C66810156F3E60008E82CF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C6680F156F3E60008E82CF /* main.m */; };
+		28C66814156F3E60008E82CF /* PSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C66813156F3E60008E82CF /* PSAppDelegate.m */; };
+		28C66817156F3E60008E82CF /* PSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C66816156F3E60008E82CF /* PSViewController.m */; };
+		28C6681A156F3E60008E82CF /* PSViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28C66818156F3E60008E82CF /* PSViewController_iPhone.xib */; };
+		28C6681D156F3E60008E82CF /* PSViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28C6681B156F3E60008E82CF /* PSViewController_iPad.xib */; };
+		28C66827156F3E84008E82CF /* PSCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C66824156F3E84008E82CF /* PSCollectionView.m */; };
+		28C66828156F3E84008E82CF /* PSCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C66826156F3E84008E82CF /* PSCollectionViewCell.m */; };
+		28C6682C156F4073008E82CF /* PSBroView.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C6682B156F4073008E82CF /* PSBroView.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		28C667FF156F3E60008E82CF /* BroBoard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BroBoard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		28C66803156F3E60008E82CF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		28C66805156F3E60008E82CF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		28C66807156F3E60008E82CF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		28C6680B156F3E60008E82CF /* BroBoard-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BroBoard-Info.plist"; sourceTree = "<group>"; };
+		28C6680D156F3E60008E82CF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		28C6680F156F3E60008E82CF /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		28C66811156F3E60008E82CF /* BroBoard-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BroBoard-Prefix.pch"; sourceTree = "<group>"; };
+		28C66812156F3E60008E82CF /* PSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PSAppDelegate.h; sourceTree = "<group>"; };
+		28C66813156F3E60008E82CF /* PSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PSAppDelegate.m; sourceTree = "<group>"; };
+		28C66815156F3E60008E82CF /* PSViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PSViewController.h; sourceTree = "<group>"; };
+		28C66816156F3E60008E82CF /* PSViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PSViewController.m; sourceTree = "<group>"; };
+		28C66819156F3E60008E82CF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/PSViewController_iPhone.xib; sourceTree = "<group>"; };
+		28C6681C156F3E60008E82CF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/PSViewController_iPad.xib; sourceTree = "<group>"; };
+		28C66823156F3E84008E82CF /* PSCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PSCollectionView.h; path = ../PSCollectionView.h; sourceTree = "<group>"; };
+		28C66824156F3E84008E82CF /* PSCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PSCollectionView.m; path = ../PSCollectionView.m; sourceTree = "<group>"; };
+		28C66825156F3E84008E82CF /* PSCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PSCollectionViewCell.h; path = ../PSCollectionViewCell.h; sourceTree = "<group>"; };
+		28C66826156F3E84008E82CF /* PSCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PSCollectionViewCell.m; path = ../PSCollectionViewCell.m; sourceTree = "<group>"; };
+		28C6682A156F4073008E82CF /* PSBroView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSBroView.h; sourceTree = "<group>"; };
+		28C6682B156F4073008E82CF /* PSBroView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSBroView.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		28C667FC156F3E60008E82CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28C66804156F3E60008E82CF /* UIKit.framework in Frameworks */,
+				28C66806156F3E60008E82CF /* Foundation.framework in Frameworks */,
+				28C66808156F3E60008E82CF /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		28C667F4156F3E60008E82CF = {
+			isa = PBXGroup;
+			children = (
+				28C66829156F3E88008E82CF /* PSCollectionView */,
+				28C66809156F3E60008E82CF /* BroBoard */,
+				28C66802156F3E60008E82CF /* Frameworks */,
+				28C66800156F3E60008E82CF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		28C66800156F3E60008E82CF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				28C667FF156F3E60008E82CF /* BroBoard.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		28C66802156F3E60008E82CF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				28C66803156F3E60008E82CF /* UIKit.framework */,
+				28C66805156F3E60008E82CF /* Foundation.framework */,
+				28C66807156F3E60008E82CF /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		28C66809156F3E60008E82CF /* BroBoard */ = {
+			isa = PBXGroup;
+			children = (
+				28C66812156F3E60008E82CF /* PSAppDelegate.h */,
+				28C66813156F3E60008E82CF /* PSAppDelegate.m */,
+				28C66815156F3E60008E82CF /* PSViewController.h */,
+				28C66816156F3E60008E82CF /* PSViewController.m */,
+				28C6682A156F4073008E82CF /* PSBroView.h */,
+				28C6682B156F4073008E82CF /* PSBroView.m */,
+				28C66818156F3E60008E82CF /* PSViewController_iPhone.xib */,
+				28C6681B156F3E60008E82CF /* PSViewController_iPad.xib */,
+				28C6680A156F3E60008E82CF /* Supporting Files */,
+			);
+			path = BroBoard;
+			sourceTree = "<group>";
+		};
+		28C6680A156F3E60008E82CF /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				28C6680B156F3E60008E82CF /* BroBoard-Info.plist */,
+				28C6680C156F3E60008E82CF /* InfoPlist.strings */,
+				28C6680F156F3E60008E82CF /* main.m */,
+				28C66811156F3E60008E82CF /* BroBoard-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		28C66829156F3E88008E82CF /* PSCollectionView */ = {
+			isa = PBXGroup;
+			children = (
+				28C66823156F3E84008E82CF /* PSCollectionView.h */,
+				28C66824156F3E84008E82CF /* PSCollectionView.m */,
+				28C66825156F3E84008E82CF /* PSCollectionViewCell.h */,
+				28C66826156F3E84008E82CF /* PSCollectionViewCell.m */,
+			);
+			name = PSCollectionView;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		28C667FE156F3E60008E82CF /* BroBoard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 28C66820156F3E60008E82CF /* Build configuration list for PBXNativeTarget "BroBoard" */;
+			buildPhases = (
+				28C667FB156F3E60008E82CF /* Sources */,
+				28C667FC156F3E60008E82CF /* Frameworks */,
+				28C667FD156F3E60008E82CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BroBoard;
+			productName = BroBoard;
+			productReference = 28C667FF156F3E60008E82CF /* BroBoard.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		28C667F6156F3E60008E82CF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = PS;
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 28C667F9156F3E60008E82CF /* Build configuration list for PBXProject "BroBoard" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 28C667F4156F3E60008E82CF;
+			productRefGroup = 28C66800156F3E60008E82CF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				28C667FE156F3E60008E82CF /* BroBoard */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		28C667FD156F3E60008E82CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28C6680E156F3E60008E82CF /* InfoPlist.strings in Resources */,
+				28C6681A156F3E60008E82CF /* PSViewController_iPhone.xib in Resources */,
+				28C6681D156F3E60008E82CF /* PSViewController_iPad.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		28C667FB156F3E60008E82CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28C66810156F3E60008E82CF /* main.m in Sources */,
+				28C66814156F3E60008E82CF /* PSAppDelegate.m in Sources */,
+				28C66817156F3E60008E82CF /* PSViewController.m in Sources */,
+				28C66827156F3E84008E82CF /* PSCollectionView.m in Sources */,
+				28C66828156F3E84008E82CF /* PSCollectionViewCell.m in Sources */,
+				28C6682C156F4073008E82CF /* PSBroView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		28C6680C156F3E60008E82CF /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				28C6680D156F3E60008E82CF /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		28C66818156F3E60008E82CF /* PSViewController_iPhone.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				28C66819156F3E60008E82CF /* en */,
+			);
+			name = PSViewController_iPhone.xib;
+			sourceTree = "<group>";
+		};
+		28C6681B156F3E60008E82CF /* PSViewController_iPad.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				28C6681C156F3E60008E82CF /* en */,
+			);
+			name = PSViewController_iPad.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		28C6681E156F3E60008E82CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		28C6681F156F3E60008E82CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		28C66821156F3E60008E82CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BroBoard/BroBoard-Prefix.pch";
+				INFOPLIST_FILE = "BroBoard/BroBoard-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		28C66822156F3E60008E82CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BroBoard/BroBoard-Prefix.pch";
+				INFOPLIST_FILE = "BroBoard/BroBoard-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		28C667F9156F3E60008E82CF /* Build configuration list for PBXProject "BroBoard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28C6681E156F3E60008E82CF /* Debug */,
+				28C6681F156F3E60008E82CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		28C66820156F3E60008E82CF /* Build configuration list for PBXNativeTarget "BroBoard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28C66821156F3E60008E82CF /* Debug */,
+				28C66822156F3E60008E82CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 28C667F6156F3E60008E82CF /* Project object */;
+}
