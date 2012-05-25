@@ -249,11 +249,9 @@ indexToRectMap = _indexToRectMap;
     
     // Add headerView if it exists
     if (self.headerView) {
-        self.headerView.top = kMargin;
         top = self.headerView.top;
         [self addSubview:self.headerView];
         top += self.headerView.height;
-        top += kMargin;
     }
     
     if (numViews > 0) {
@@ -323,7 +321,6 @@ indexToRectMap = _indexToRectMap;
         self.footerView.top = totalHeight;
         [self addSubview:self.footerView];
         totalHeight += self.footerView.height;
-        totalHeight += kMargin;
     }
     
     self.contentSize = CGSizeMake(self.width, totalHeight);
