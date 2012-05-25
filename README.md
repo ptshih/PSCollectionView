@@ -30,6 +30,12 @@ Just open and run in simulator, it works on both iPhone (2 columns) AND iPad (4 
 
 It shows an example of using PSCollectionView and a subclass of PSCollectionViewCell
 
+ARC
+---
+PSCollectionView, by default, is not ARC ready.
+
+However, there is an 'arc' branch that has been converted for use with ARC projects.
+
 How to use:
 ---
 Here's an example of creating an instance of PSCollectionView
