@@ -7,8 +7,11 @@
 //
 
 #import "PSViewController.h"
-
 #import "PSBroView.h"
+
+/**
+ This is an example of a controller that uses PSCollectionView
+ */
 
 /**
  Detect iPad
@@ -149,7 +152,9 @@ collectionView = _collectionView;
 }
 
 - (void)collectionView:(PSCollectionView *)collectionView didSelectView:(PSCollectionViewCell *)view atIndex:(NSInteger)index {
-    NSDictionary *item = [self.items objectAtIndex:index];
+//    NSDictionary *item = [self.items objectAtIndex:index];
+    
+    // You can do something when the user taps on a collectionViewCell here
 }
 
 @end

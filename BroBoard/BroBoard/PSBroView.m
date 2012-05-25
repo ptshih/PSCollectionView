@@ -7,6 +7,7 @@
 //
 
 /**
+ This is an example of a subclass of PSCollectionViewCell
  */
 
 #import "PSBroView.h"
