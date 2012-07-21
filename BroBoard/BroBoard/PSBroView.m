@@ -86,7 +86,11 @@ captionLabel = _captionLabel;
         self.imageView.image = [UIImage imageWithData:data];
     }];
     
-    self.captionLabel.text = [object objectForKey:@"title"];
+    NSString *title = [object objectForKey:@"title"];
+    if ([title isKindOfClass:[NSString class]])
+    {
+        self.captionLabel.text = title;
+    }
 }
 
 + (CGFloat)heightForViewWithObject:(id)object inColumnWidth:(CGFloat)columnWidth {
@@ -105,7 +109,10 @@ captionLabel = _captionLabel;
     NSString *caption = [object objectForKey:@"title"];
     CGSize labelSize = CGSizeZero;
     UIFont *labelFont = [UIFont boldSystemFontOfSize:14.0];
-    labelSize = [caption sizeWithFont:labelFont constrainedToSize:CGSizeMake(width, INT_MAX) lineBreakMode:UILineBreakModeWordWrap];
+    if ([caption isKindOfClass:[NSString class]])
+    {
+        labelSize = [caption sizeWithFont:labelFont constrainedToSize:CGSizeMake(width, INT_MAX) lineBreakMode:UILineBreakModeWordWrap];
+    }
     height += labelSize.height;
     
     height += MARGIN;

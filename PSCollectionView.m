@@ -115,7 +115,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 @property (nonatomic, assign, readwrite) NSInteger numCols;
 @property (nonatomic, assign) UIInterfaceOrientation orientation;
 
-@property (nonatomic, retain) NSMutableSet *reuseableViews;
+@property (nonatomic, retain) NSMutableArray *reuseableViews;
 @property (nonatomic, retain) NSMutableDictionary *visibleViews;
 @property (nonatomic, retain) NSMutableArray *viewKeysToRemove;
 @property (nonatomic, retain) NSMutableDictionary *indexToRectMap;
@@ -178,7 +178,7 @@ indexToRectMap = _indexToRectMap;
         self.numColsLandscape = 0;
         self.orientation = [UIApplication sharedApplication].statusBarOrientation;
         
-        self.reuseableViews = [NSMutableSet set];
+        self.reuseableViews = [NSMutableArray array];
         self.visibleViews = [NSMutableDictionary dictionary];
         self.viewKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
@@ -417,16 +417,23 @@ indexToRectMap = _indexToRectMap;
 
 #pragma mark - Reusing Views
 
-- (PSCollectionViewCell *)dequeueReusableView {
-    PSCollectionViewCell *view = [self.reuseableViews anyObject];
-    if (view) {
-        // Found a reusable view, remove it from the set
-        [view retain];
-        [self.reuseableViews removeObject:view];
-        [view autorelease];
+- (PSCollectionViewCell *)dequeueReusableView:(Class) inClass {
+    NSUInteger i = 0;
+    NSUInteger count = [self.reuseableViews count];
+    PSCollectionViewCell *view = nil;
+    for (i = 0; i < count; i++)
+    {
+        view = [self.reuseableViews objectAtIndex:i];
+        if ([view isKindOfClass:inClass]) {
+            // Found a reusable view, remove it from the set
+            [view retain];
+            [self.reuseableViews removeObject:view];
+            [view autorelease];
+            return view;
+        }
     }
     
-    return view;
+    return nil;
 }
 
 - (void)enqueueReusableView:(PSCollectionViewCell *)view {
