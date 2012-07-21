@@ -137,7 +137,7 @@ collectionView = _collectionView;
 - (PSCollectionViewCell *)collectionView:(PSCollectionView *)collectionView viewAtIndex:(NSInteger)index {
     NSDictionary *item = [self.items objectAtIndex:index];
     
-    PSBroView *v = (PSBroView *)[self.collectionView dequeueReusableView];
+    PSBroView *v = (PSBroView *)[self.collectionView dequeueReusableView:[PSBroView class]];
     if (!v) {
         v = [[PSBroView alloc] initWithFrame:CGRectZero];
     }
