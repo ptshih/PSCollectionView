@@ -41,6 +41,7 @@ object = _object;
 
 
 - (void)prepareForReuse {
+	self.object = nil;
 }
 
 - (void)fillViewWithObject:(id)object {
