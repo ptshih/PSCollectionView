@@ -38,12 +38,12 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @interface UIView (PSCollectionView)
 
-@property(nonatomic) CGFloat left;
-@property(nonatomic) CGFloat top;
-@property(nonatomic, readonly) CGFloat right;
-@property(nonatomic, readonly) CGFloat bottom;
-@property(nonatomic) CGFloat width;
-@property(nonatomic) CGFloat height;
+@property(nonatomic, assign) CGFloat left;
+@property(nonatomic, assign) CGFloat top;
+@property(nonatomic, assign, readonly) CGFloat right;
+@property(nonatomic, assign, readonly) CGFloat bottom;
+@property(nonatomic, assign) CGFloat width;
+@property(nonatomic, assign) CGFloat height;
 
 @end
 
@@ -115,10 +115,10 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 @property (nonatomic, assign, readwrite) NSInteger numCols;
 @property (nonatomic, assign) UIInterfaceOrientation orientation;
 
-@property (nonatomic, retain) NSMutableSet *reuseableViews;
-@property (nonatomic, retain) NSMutableDictionary *visibleViews;
-@property (nonatomic, retain) NSMutableArray *viewKeysToRemove;
-@property (nonatomic, retain) NSMutableDictionary *indexToRectMap;
+@property (nonatomic, strong) NSMutableSet *reuseableViews;
+@property (nonatomic, strong) NSMutableDictionary *visibleViews;
+@property (nonatomic, strong) NSMutableArray *viewKeysToRemove;
+@property (nonatomic, strong) NSMutableDictionary *indexToRectMap;
 
 
 /**
@@ -191,18 +191,6 @@ indexToRectMap = _indexToRectMap;
     self.delegate = nil;
     self.collectionViewDataSource = nil;
     self.collectionViewDelegate = nil;
-    
-    // release retains
-    self.headerView = nil;
-    self.footerView = nil;
-    self.emptyView = nil;
-    self.loadingView = nil;
-    
-    self.reuseableViews = nil;
-    self.visibleViews = nil;
-    self.viewKeysToRemove = nil;
-    self.indexToRectMap = nil;
-    [super dealloc];
 }
 
 #pragma mark - Setters
@@ -211,8 +199,7 @@ indexToRectMap = _indexToRectMap;
     if (_loadingView && [_loadingView respondsToSelector:@selector(removeFromSuperview)]) {
         [_loadingView removeFromSuperview];
     }
-    [_loadingView release], _loadingView = nil;
-    _loadingView = [loadingView retain];
+    _loadingView = loadingView;
     
     [self addSubview:_loadingView];
 }
@@ -262,11 +249,10 @@ indexToRectMap = _indexToRectMap;
     
     // Add headerView if it exists
     if (self.headerView) {
-        self.headerView.top = kMargin;
+        self.headerView.width = self.width;
         top = self.headerView.top;
         [self addSubview:self.headerView];
         top += self.headerView.height;
-        top += kMargin;
     }
     
     if (numViews > 0) {
@@ -333,10 +319,10 @@ indexToRectMap = _indexToRectMap;
     
     // Add footerView if exists
     if (self.footerView) {
+        self.footerView.width = self.width;
         self.footerView.top = totalHeight;
         [self addSubview:self.footerView];
         totalHeight += self.footerView.height;
-        totalHeight += kMargin;
     }
     
     self.contentSize = CGSizeMake(self.width, totalHeight);
@@ -404,7 +390,7 @@ indexToRectMap = _indexToRectMap;
             
             // Setup gesture recognizer
             if ([newView.gestureRecognizers count] == 0) {
-                PSCollectionViewTapGestureRecognizer *gr = [[[PSCollectionViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
+                PSCollectionViewTapGestureRecognizer *gr = [[PSCollectionViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)];
                 gr.delegate = self;
                 [newView addGestureRecognizer:gr];
                 newView.userInteractionEnabled = YES;
@@ -421,9 +407,7 @@ indexToRectMap = _indexToRectMap;
     PSCollectionViewCell *view = [self.reuseableViews anyObject];
     if (view) {
         // Found a reusable view, remove it from the set
-        [view retain];
         [self.reuseableViews removeObject:view];
-        [view autorelease];
     }
     
     return view;
