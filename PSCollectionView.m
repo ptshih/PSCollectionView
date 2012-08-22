@@ -249,6 +249,7 @@ indexToRectMap = _indexToRectMap;
     
     // Add headerView if it exists
     if (self.headerView) {
+        self.headerView.width = self.width;
         top = self.headerView.top;
         [self addSubview:self.headerView];
         top += self.headerView.height;
@@ -318,6 +319,7 @@ indexToRectMap = _indexToRectMap;
     
     // Add footerView if exists
     if (self.footerView) {
+        self.footerView.width = self.width;
         self.footerView.top = totalHeight;
         [self addSubview:self.footerView];
         totalHeight += self.footerView.height;
