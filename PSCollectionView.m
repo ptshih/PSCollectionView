@@ -250,8 +250,12 @@ indexToRectMap = _indexToRectMap;
     // Add headerView if it exists
     if (self.headerView) {
         self.headerView.width = self.width;
+		
         top = self.headerView.top;
         [self addSubview:self.headerView];
+		
+		CGSize headerSize = [self.headerView sizeThatFits:CGSizeMake(self.width, CGFLOAT_MAX)];
+		self.headerView.height = headerSize.height;
         top += self.headerView.height;
     }
     
@@ -322,6 +326,9 @@ indexToRectMap = _indexToRectMap;
         self.footerView.width = self.width;
         self.footerView.top = totalHeight;
         [self addSubview:self.footerView];
+		
+		CGSize footerSize = [self.footerView sizeThatFits:CGSizeMake(self.width, CGFLOAT_MAX)];
+		self.footerView.height = footerSize.height;
         totalHeight += self.footerView.height;
     }
     
