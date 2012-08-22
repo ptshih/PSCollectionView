@@ -24,7 +24,7 @@
 #import "PSCollectionView.h"
 #import "PSCollectionViewCell.h"
 
-#define kMargin 8.0
+#define kDefaultMargin 8.0
 
 static inline NSString * PSCollectionKeyForIndex(NSInteger index) {
     return [NSString stringWithFormat:@"%d", index];
@@ -150,6 +150,7 @@ loadingView = _loadingView;
 
 // Public
 @synthesize
+margin = _margin,
 colWidth = _colWidth,
 numCols = _numCols,
 numColsLandscape = _numColsLandscape,
@@ -171,6 +172,8 @@ indexToRectMap = _indexToRectMap;
     self = [super initWithFrame:frame];
     if (self) {
         self.alwaysBounceVertical = YES;
+		
+		self.margin = kDefaultMargin;
         
         self.colWidth = 0.0;
         self.numCols = 0;
@@ -245,7 +248,7 @@ indexToRectMap = _indexToRectMap;
     NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
     
     CGFloat totalHeight = 0.0;
-    CGFloat top = kMargin;
+    CGFloat top = self.margin;
     
     // Add headerView if it exists
     if (self.headerView) {
@@ -267,7 +270,7 @@ indexToRectMap = _indexToRectMap;
         }
         
         // Calculate index to rect mapping
-        self.colWidth = floorf((self.width - kMargin * (self.numCols + 1)) / self.numCols);
+        self.colWidth = floorf((self.width - self.margin * (self.numCols + 1)) / self.numCols);
         for (NSInteger i = 0; i < numViews; i++) {
             NSString *key = PSCollectionKeyForIndex(i);
             
@@ -283,7 +286,7 @@ indexToRectMap = _indexToRectMap;
                 }
             }
             
-            CGFloat left = kMargin + (col * kMargin) + (col * self.colWidth);
+            CGFloat left = self.margin + (col * self.margin) + (col * self.colWidth);
             CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
             CGFloat colHeight = [self.collectionViewDataSource heightForViewAtIndex:i];
             if (colHeight == 0) {
@@ -300,7 +303,7 @@ indexToRectMap = _indexToRectMap;
             [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
             
             // Update the last height offset for this column
-            CGFloat test = top + colHeight + kMargin;
+            CGFloat test = top + colHeight + self.margin;
             
             if (test != test) {
                 // NaN
@@ -316,7 +319,7 @@ indexToRectMap = _indexToRectMap;
         
         // If we have an empty view, show it
         if (self.emptyView) {
-            self.emptyView.frame = CGRectMake(kMargin, top, self.width - kMargin * 2, self.height - top - kMargin);
+            self.emptyView.frame = CGRectMake(self.margin, top, self.width - self.margin * 2, self.height - top - self.margin);
             [self addSubview:self.emptyView];
         }
     }
