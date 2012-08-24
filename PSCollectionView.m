@@ -119,7 +119,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 @property (nonatomic, strong) NSMutableDictionary *visibleViews;
 @property (nonatomic, strong) NSMutableArray *viewKeysToRemove;
 @property (nonatomic, strong) NSMutableDictionary *indexToRectMap;
-
+@property (nonatomic, strong) NSMutableArray *colOffsets;
 
 /**
  Forces a relayout of the collection grid
@@ -164,7 +164,8 @@ orientation = _orientation,
 reuseableViews = _reuseableViews,
 visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
-indexToRectMap = _indexToRectMap;
+indexToRectMap = _indexToRectMap,
+colOffsets = _colOffsets;
 
 #pragma mark - Init/Memory
 
@@ -227,6 +228,79 @@ indexToRectMap = _indexToRectMap;
     }
 }
 
+- (void)buildColumnOffsetsFromTop:(CGFloat) top
+{
+	self.colOffsets = [NSMutableArray arrayWithCapacity:self.numCols];
+	for (int i = 0; i < self.numCols; i++) {
+		[_colOffsets addObject:[NSNumber numberWithFloat:top]];
+	}
+}
+
+- (NSInteger)findShortestColumn
+{
+	NSInteger col = 0;
+	CGFloat minHeight = [[_colOffsets objectAtIndex:col] floatValue];
+	for (int i = 1; i < [_colOffsets count]; i++) {
+		CGFloat colHeight = [[_colOffsets objectAtIndex:i] floatValue];
+		
+		if (colHeight < minHeight) {
+			col = i;
+			minHeight = colHeight;
+		}
+	}
+	return col;
+}
+
+- (void)insertViewRectForIndex:(int)index forKey:(NSString *)key inColumn:(NSInteger)col
+{
+	CGFloat left = self.margin + (col * self.margin) + (col * self.colWidth);
+	CGFloat top = [[_colOffsets objectAtIndex:col] floatValue];
+	CGFloat colHeight = [self.collectionViewDataSource heightForViewAtIndex:index];
+	if (colHeight == 0) {
+		colHeight = self.colWidth;
+	}
+	
+	if (top != top) {
+		// NaN
+	}
+	
+	CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
+	
+	// Add to index rect map
+	[self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
+	
+	// Update the last height offset for this column
+	CGFloat test = top + colHeight + self.margin;
+	
+	if (test != test) {
+		// NaN
+	}
+	[_colOffsets replaceObjectAtIndex:col withObject:[NSNumber numberWithFloat:test]];
+}
+
+- (CGFloat)updateFooterViewWithTotalHeight:(CGFloat)totalHeight
+{
+	// Add footerView if exists
+    if (self.footerView) {
+        self.footerView.width = self.width;
+        self.footerView.top = totalHeight;
+        [self addSubview:self.footerView];
+		
+		CGSize footerSize = [self.footerView sizeThatFits:CGSizeMake(self.width, CGFLOAT_MAX)];
+		self.footerView.height = footerSize.height;
+        totalHeight += self.footerView.height;
+    }
+	return totalHeight;
+}
+
+- (CGFloat)totalHeightFromColOffsetsWithTotalHeight:(CGFloat)totalHeight
+{
+	for (NSNumber *colHeight in _colOffsets) {
+		totalHeight = (totalHeight < [colHeight floatValue]) ? [colHeight floatValue] : totalHeight;
+	}
+	return totalHeight;
+}
+
 - (void)relayoutViews {
     self.numCols = UIInterfaceOrientationIsPortrait(self.orientation) ? self.numColsPortrait : self.numColsLandscape;
     
@@ -264,10 +338,7 @@ indexToRectMap = _indexToRectMap;
     
     if (numViews > 0) {
         // This array determines the last height offset on a column
-        NSMutableArray *colOffsets = [NSMutableArray arrayWithCapacity:self.numCols];
-        for (int i = 0; i < self.numCols; i++) {
-            [colOffsets addObject:[NSNumber numberWithFloat:top]];
-        }
+        [self buildColumnOffsetsFromTop:top];
         
         // Calculate index to rect mapping
         self.colWidth = floorf((self.width - self.margin * (self.numCols + 1)) / self.numCols);
@@ -275,45 +346,11 @@ indexToRectMap = _indexToRectMap;
             NSString *key = PSCollectionKeyForIndex(i);
             
             // Find the shortest column
-            NSInteger col = 0;
-            CGFloat minHeight = [[colOffsets objectAtIndex:col] floatValue];
-            for (int i = 1; i < [colOffsets count]; i++) {
-                CGFloat colHeight = [[colOffsets objectAtIndex:i] floatValue];
-                
-                if (colHeight < minHeight) {
-                    col = i;
-                    minHeight = colHeight;
-                }
-            }
-            
-            CGFloat left = self.margin + (col * self.margin) + (col * self.colWidth);
-            CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
-            CGFloat colHeight = [self.collectionViewDataSource heightForViewAtIndex:i];
-            if (colHeight == 0) {
-                colHeight = self.colWidth;
-            }
-            
-            if (top != top) {
-                // NaN
-            }
-            
-            CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
-            
-            // Add to index rect map
-            [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
-            
-            // Update the last height offset for this column
-            CGFloat test = top + colHeight + self.margin;
-            
-            if (test != test) {
-                // NaN
-            }
-            [colOffsets replaceObjectAtIndex:col withObject:[NSNumber numberWithFloat:test]];
+            NSInteger col = [self findShortestColumn];
+			[self insertViewRectForIndex:i forKey:key inColumn:col];
         }
-        
-        for (NSNumber *colHeight in colOffsets) {
-            totalHeight = (totalHeight < [colHeight floatValue]) ? [colHeight floatValue] : totalHeight;
-        }
+		
+		totalHeight = [self totalHeightFromColOffsetsWithTotalHeight:(CGFloat)totalHeight];
     } else {
         totalHeight = self.height;
         
@@ -324,16 +361,7 @@ indexToRectMap = _indexToRectMap;
         }
     }
     
-    // Add footerView if exists
-    if (self.footerView) {
-        self.footerView.width = self.width;
-        self.footerView.top = totalHeight;
-        [self addSubview:self.footerView];
-		
-		CGSize footerSize = [self.footerView sizeThatFits:CGSizeMake(self.width, CGFLOAT_MAX)];
-		self.footerView.height = footerSize.height;
-        totalHeight += self.footerView.height;
-    }
+    totalHeight = [self updateFooterViewWithTotalHeight:totalHeight];
     
     self.contentSize = CGSizeMake(self.width, totalHeight);
     
@@ -409,6 +437,27 @@ indexToRectMap = _indexToRectMap;
             [self.visibleViews setObject:newView forKey:key];
         }
     }
+}
+
+- (void)appendView
+{
+	NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
+	if ([self.indexToRectMap count] == 0 || numViews == 1) {
+		//just build via a reload
+		[self reloadData];
+	} else {
+		NSString *key = PSCollectionKeyForIndex(numViews-1);
+		
+		// Find the shortest column
+		NSInteger col = [self findShortestColumn];
+		[self insertViewRectForIndex:numViews-1 forKey:key inColumn:col];
+		CGFloat totalHeight = [self totalHeightFromColOffsetsWithTotalHeight:0.0f];
+		
+		totalHeight = [self updateFooterViewWithTotalHeight:totalHeight];
+		
+		self.contentSize = CGSizeMake(self.width, totalHeight);
+		[self removeAndAddCellsIfNecessary];
+	}
 }
 
 #pragma mark - Reusing Views

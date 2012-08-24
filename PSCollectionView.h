@@ -58,6 +58,11 @@
  */
 - (UIView *)dequeueReusableView;
 
+/**
+ Tells the collection view one more PSCollectionViewCell is added to the end
+ */
+- (void)appendView;
+
 @end
 
 #pragma mark - Delegate
