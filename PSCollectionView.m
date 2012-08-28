@@ -268,7 +268,7 @@ colOffsets = _colOffsets;
 	CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
 	
 	// Add to index rect map
-	[self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
+	[self.indexToRectMap setObject:[NSValue valueWithCGRect:viewRect] forKey:key];
 	
 	// Update the last height offset for this column
 	CGFloat test = top + colHeight + self.margin;
@@ -417,14 +417,14 @@ colOffsets = _colOffsets;
     
     // Add views
     for (NSInteger i = topIndex; i < bottomIndex; i++) {
-        CGRect rect = CGRectFromString([self.indexToRectMap objectForKey:key]);
         NSNumber *key = PSCollectionKeyForIndex(i);
+		CGRect rect = [[self.indexToRectMap objectForKey:key] CGRectValue];
         
         // If view is within visible rect and is not already shown
         if (![self.visibleViews objectForKey:key] && CGRectIntersectsRect(visibleRect, rect)) {
             // Only add views if not visible
             PSCollectionViewCell *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
-            newView.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
+            newView.frame = [[self.indexToRectMap objectForKey:key] CGRectValue];
             [self addSubview:newView];
             
             // Setup gesture recognizer
@@ -484,9 +484,9 @@ colOffsets = _colOffsets;
 
 #pragma mark - Gesture Recognizer
 
-- (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {    
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
-    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
+- (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
+	NSValue *rectValue = [NSValue valueWithCGRect:gestureRecognizer.view.frame];
+    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectValue];
     NSString *key = [matchingKeys lastObject];
     if ([gestureRecognizer.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
         if (self.collectionViewDelegate && [self.collectionViewDelegate respondsToSelector:@selector(collectionView:didSelectView:atIndex:)]) {
@@ -499,8 +499,8 @@ colOffsets = _colOffsets;
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     if (![gestureRecognizer isMemberOfClass:[PSCollectionViewTapGestureRecognizer class]]) return YES;
     
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
-    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
+    NSValue *rectValue = [NSValue valueWithCGRect:gestureRecognizer.view.frame];
+    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectValue];
     NSString *key = [matchingKeys lastObject];
     
     if ([touch.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
