@@ -252,7 +252,7 @@ colOffsets = _colOffsets;
 	return col;
 }
 
-- (void)insertViewRectForIndex:(int)index forKey:(NSString *)key inColumn:(NSInteger)col
+- (void)insertViewRectForIndex:(int)index forKey:(id <NSCopying>)key inColumn:(NSInteger)col
 {
 	CGFloat left = self.margin + (col * self.margin) + (col * self.colWidth);
 	CGFloat top = [[_colOffsets objectAtIndex:col] floatValue];
