@@ -25,6 +25,7 @@
 #import "PSCollectionViewCell.h"
 
 #define kDefaultMargin 8.0
+#define kAnimationDuration 0.3f
 
 static inline NSNumber * PSCollectionKeyForIndex(NSInteger index) {
 	return [NSNumber numberWithInteger:index];
@@ -120,6 +121,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 @property (nonatomic, strong) NSMutableArray *viewKeysToRemove;
 @property (nonatomic, strong) NSMutableDictionary *indexToRectMap;
 @property (nonatomic, strong) NSMutableArray *colOffsets;
+@property (nonatomic, strong) NSMutableIndexSet *loadedIndices;
 
 /**
  Forces a relayout of the collection grid
@@ -139,7 +141,9 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @end
 
-@implementation PSCollectionView
+@implementation PSCollectionView {
+	BOOL _resetLoadedIndices;
+}
 
 // Public Views
 @synthesize
@@ -165,7 +169,8 @@ reuseableViews = _reuseableViews,
 visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
 indexToRectMap = _indexToRectMap,
-colOffsets = _colOffsets;
+colOffsets = _colOffsets,
+loadedIndices = _loadedIndices;
 
 #pragma mark - Init/Memory
 
@@ -186,6 +191,7 @@ colOffsets = _colOffsets;
         self.visibleViews = [NSMutableDictionary dictionary];
         self.viewKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
+		self.loadedIndices = [NSMutableIndexSet indexSet];
     }
     return self;
 }
@@ -211,6 +217,7 @@ colOffsets = _colOffsets;
 #pragma mark - DataSource
 
 - (void)reloadData {
+	_resetLoadedIndices = YES;
     [self relayoutViews];
 }
 
@@ -312,7 +319,11 @@ colOffsets = _colOffsets;
     [self.visibleViews removeAllObjects];
     [self.viewKeysToRemove removeAllObjects];
     [self.indexToRectMap removeAllObjects];
-    
+	if (_resetLoadedIndices) {
+		self.loadedIndices = [NSMutableIndexSet indexSet];
+		_resetLoadedIndices = NO;
+	}
+	
     if (self.emptyView) {
         [self.emptyView removeFromSuperview];
     }
@@ -424,8 +435,17 @@ colOffsets = _colOffsets;
             // Only add views if not visible
             PSCollectionViewCell *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
             newView.frame = [[self.indexToRectMap objectForKey:key] CGRectValue];
-            [self addSubview:newView];
-            
+			if ([self.loadedIndices containsIndex:i]) {
+				[self addSubview:newView];
+			} else { //animate it in, add it to the set
+				[self.loadedIndices addIndex:i];
+				newView.alpha = 0.0f;
+				[self addSubview:newView];
+				[UIView animateWithDuration:kAnimationDuration animations:^{
+					newView.alpha = 1.0f;
+				}];
+			}
+        
             // Setup gesture recognizer
             if ([newView.gestureRecognizers count] == 0) {
                 PSCollectionViewTapGestureRecognizer *gr = [[PSCollectionViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)];
@@ -477,6 +497,7 @@ colOffsets = _colOffsets;
         [view performSelector:@selector(prepareForReuse)];
     }
     view.frame = CGRectZero;
+	view.alpha = 1.0f;
     [self.reuseableViews addObject:view];
     [view removeFromSuperview];
 }
