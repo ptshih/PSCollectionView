@@ -27,7 +27,6 @@
 #define kDefaultMargin 8.0
 
 static inline NSNumber * PSCollectionKeyForIndex(NSInteger index) {
-    //return [NSString stringWithFormat:@"%d", index];
 	return [NSNumber numberWithInteger:index];
 }
 
