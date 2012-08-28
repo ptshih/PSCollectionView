@@ -26,8 +26,8 @@
 
 #define kDefaultMargin 8.0
 
-static inline NSString * PSCollectionKeyForIndex(NSInteger index) {
-    return [NSString stringWithFormat:@"%d", index];
+static inline NSNumber * PSCollectionKeyForIndex(NSInteger index) {
+	return [NSNumber numberWithInteger:index];
 }
 
 static inline NSInteger PSCollectionIndexForKey(NSString *key) {
@@ -251,7 +251,7 @@ colOffsets = _colOffsets;
 	return col;
 }
 
-- (void)insertViewRectForIndex:(int)index forKey:(NSString *)key inColumn:(NSInteger)col
+- (void)insertViewRectForIndex:(int)index forKey:(id <NSCopying>)key inColumn:(NSInteger)col
 {
 	CGFloat left = self.margin + (col * self.margin) + (col * self.colWidth);
 	CGFloat top = [[_colOffsets objectAtIndex:col] floatValue];
@@ -267,7 +267,7 @@ colOffsets = _colOffsets;
 	CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
 	
 	// Add to index rect map
-	[self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
+	[self.indexToRectMap setObject:[NSValue valueWithCGRect:viewRect] forKey:key];
 	
 	// Update the last height offset for this column
 	CGFloat test = top + colHeight + self.margin;
@@ -343,7 +343,7 @@ colOffsets = _colOffsets;
         // Calculate index to rect mapping
         self.colWidth = floorf((self.width - self.margin * (self.numCols + 1)) / self.numCols);
         for (NSInteger i = 0; i < numViews; i++) {
-            NSString *key = PSCollectionKeyForIndex(i);
+            NSNumber *key = PSCollectionKeyForIndex(i);
             
             // Find the shortest column
             NSInteger col = [self findShortestColumn];
@@ -416,14 +416,14 @@ colOffsets = _colOffsets;
     
     // Add views
     for (NSInteger i = topIndex; i < bottomIndex; i++) {
-        NSString *key = PSCollectionKeyForIndex(i);
-        CGRect rect = CGRectFromString([self.indexToRectMap objectForKey:key]);
+        NSNumber *key = PSCollectionKeyForIndex(i);
+		CGRect rect = [[self.indexToRectMap objectForKey:key] CGRectValue];
         
         // If view is within visible rect and is not already shown
         if (![self.visibleViews objectForKey:key] && CGRectIntersectsRect(visibleRect, rect)) {
             // Only add views if not visible
             PSCollectionViewCell *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
-            newView.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
+            newView.frame = [[self.indexToRectMap objectForKey:key] CGRectValue];
             [self addSubview:newView];
             
             // Setup gesture recognizer
@@ -446,7 +446,7 @@ colOffsets = _colOffsets;
 		//just build via a reload
 		[self reloadData];
 	} else {
-		NSString *key = PSCollectionKeyForIndex(numViews-1);
+		NSNumber *key = PSCollectionKeyForIndex(numViews-1);
 		
 		// Find the shortest column
 		NSInteger col = [self findShortestColumn];
@@ -483,9 +483,9 @@ colOffsets = _colOffsets;
 
 #pragma mark - Gesture Recognizer
 
-- (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {    
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
-    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
+- (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
+	NSValue *rectValue = [NSValue valueWithCGRect:gestureRecognizer.view.frame];
+    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectValue];
     NSString *key = [matchingKeys lastObject];
     if ([gestureRecognizer.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
         if (self.collectionViewDelegate && [self.collectionViewDelegate respondsToSelector:@selector(collectionView:didSelectView:atIndex:)]) {
@@ -498,8 +498,8 @@ colOffsets = _colOffsets;
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     if (![gestureRecognizer isMemberOfClass:[PSCollectionViewTapGestureRecognizer class]]) return YES;
     
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
-    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
+    NSValue *rectValue = [NSValue valueWithCGRect:gestureRecognizer.view.frame];
+    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectValue];
     NSString *key = [matchingKeys lastObject];
     
     if ([touch.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
