@@ -26,8 +26,9 @@
 
 #define kDefaultMargin 8.0
 
-static inline NSString * PSCollectionKeyForIndex(NSInteger index) {
-    return [NSString stringWithFormat:@"%d", index];
+static inline NSNumber * PSCollectionKeyForIndex(NSInteger index) {
+    //return [NSString stringWithFormat:@"%d", index];
+	return [NSNumber numberWithInteger:index];
 }
 
 static inline NSInteger PSCollectionIndexForKey(NSString *key) {
@@ -343,7 +344,7 @@ colOffsets = _colOffsets;
         // Calculate index to rect mapping
         self.colWidth = floorf((self.width - self.margin * (self.numCols + 1)) / self.numCols);
         for (NSInteger i = 0; i < numViews; i++) {
-            NSString *key = PSCollectionKeyForIndex(i);
+            NSNumber *key = PSCollectionKeyForIndex(i);
             
             // Find the shortest column
             NSInteger col = [self findShortestColumn];
@@ -416,8 +417,8 @@ colOffsets = _colOffsets;
     
     // Add views
     for (NSInteger i = topIndex; i < bottomIndex; i++) {
-        NSString *key = PSCollectionKeyForIndex(i);
         CGRect rect = CGRectFromString([self.indexToRectMap objectForKey:key]);
+        NSNumber *key = PSCollectionKeyForIndex(i);
         
         // If view is within visible rect and is not already shown
         if (![self.visibleViews objectForKey:key] && CGRectIntersectsRect(visibleRect, rect)) {
@@ -446,7 +447,7 @@ colOffsets = _colOffsets;
 		//just build via a reload
 		[self reloadData];
 	} else {
-		NSString *key = PSCollectionKeyForIndex(numViews-1);
+		NSNumber *key = PSCollectionKeyForIndex(numViews-1);
 		
 		// Find the shortest column
 		NSInteger col = [self findShortestColumn];
