@@ -41,6 +41,7 @@
 @property (nonatomic, assign, readonly) NSInteger numCols;
 @property (nonatomic, assign) NSInteger numColsLandscape;
 @property (nonatomic, assign) NSInteger numColsPortrait;
+@property (nonatomic, assign) BOOL animateFirstCellAppearance;
 @property (nonatomic, unsafe_unretained) id <PSCollectionViewDelegate> collectionViewDelegate;
 @property (nonatomic, unsafe_unretained) id <PSCollectionViewDataSource> collectionViewDataSource;
 

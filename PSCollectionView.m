@@ -159,6 +159,7 @@ colWidth = _colWidth,
 numCols = _numCols,
 numColsLandscape = _numColsLandscape,
 numColsPortrait = _numColsPortrait,
+animateFirstCellAppearance = _animateFirstCellAppearance,
 collectionViewDelegate = _collectionViewDelegate,
 collectionViewDataSource = _collectionViewDataSource;
 
@@ -192,6 +193,7 @@ loadedIndices = _loadedIndices;
         self.viewKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
 		self.loadedIndices = [NSMutableIndexSet indexSet];
+		self.animateFirstCellAppearance = YES;
     }
     return self;
 }
@@ -439,11 +441,13 @@ loadedIndices = _loadedIndices;
 				[self addSubview:newView];
 			} else { //animate it in, add it to the set
 				[self.loadedIndices addIndex:i];
-				newView.alpha = 0.0f;
 				[self addSubview:newView];
-				[UIView animateWithDuration:kAnimationDuration animations:^{
-					newView.alpha = 1.0f;
-				}];
+				if (self.animateFirstCellAppearance) {
+					newView.alpha = 0.0f;
+					[UIView animateWithDuration:kAnimationDuration animations:^{
+						newView.alpha = 1.0f;
+					}];
+				}
 			}
         
             // Setup gesture recognizer
