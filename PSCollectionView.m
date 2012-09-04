@@ -247,9 +247,9 @@ headerViewHeight = _headerViewHeight;
 			self.headerViewHeight = headerSize.height;
 			
 			[self adjustYOffsetsWithDelta:delta];
-		} else {
-			[self removeAndAddCellsIfNecessary];
 		}
+		
+		[self removeAndAddCellsIfNecessary];
 	}
 }
 
