@@ -123,6 +123,8 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 @property (nonatomic, strong) NSMutableArray *colOffsets;
 @property (nonatomic, strong) NSMutableIndexSet *loadedIndices;
 
+@property (nonatomic, assign, readwrite) CGFloat headerViewHeight;
+
 /**
  Forces a relayout of the collection grid
  */
@@ -171,7 +173,8 @@ visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
 indexToRectMap = _indexToRectMap,
 colOffsets = _colOffsets,
-loadedIndices = _loadedIndices;
+loadedIndices = _loadedIndices,
+headerViewHeight = _headerViewHeight;
 
 #pragma mark - Init/Memory
 
@@ -194,6 +197,7 @@ loadedIndices = _loadedIndices;
         self.indexToRectMap = [NSMutableDictionary dictionary];
 		self.loadedIndices = [NSMutableIndexSet indexSet];
 		self.animateFirstCellAppearance = YES;
+		self.headerViewHeight = 0.0f;
     }
     return self;
 }
@@ -232,9 +236,38 @@ loadedIndices = _loadedIndices;
     if (self.orientation != orientation) {
         self.orientation = orientation;
         [self relayoutViews];
-    } else {
-        [self removeAndAddCellsIfNecessary];
-    }
+	} else {
+		//determine if the header has changed height
+		CGSize headerSize = [self.headerView sizeThatFits:CGSizeMake(self.width, CGFLOAT_MAX)];
+		if (self.headerViewHeight != headerSize.height) {
+			//need to adjust all the cells and column heights to reflect the new header height
+			CGFloat delta = headerSize.height - self.headerViewHeight;
+			
+			self.headerView.height = headerSize.height;
+			self.headerViewHeight = headerSize.height;
+			
+			[self adjustYOffsetsWithDelta:delta];
+		} else {
+			[self removeAndAddCellsIfNecessary];
+		}
+	}
+}
+
+- (void)adjustYOffsetsWithDelta:(CGFloat)delta
+{
+	//adjust the column heights
+	for (int i = 0; i < self.numCols; i++) {
+		CGFloat colHeight = [[_colOffsets objectAtIndex:i] floatValue];
+		NSNumber *newOffset = [NSNumber numberWithFloat:colHeight + delta];
+		[_colOffsets replaceObjectAtIndex:i withObject:newOffset];
+	}
+	
+	//adjust all the cell positions
+	NSArray *visibleViewValues = _visibleViews.allValues;
+	for (UIView *visibleView in visibleViewValues) {
+		CGRect newFrame = CGRectOffset(visibleView.frame, 0, delta);
+		visibleView.frame = newFrame;
+	}
 }
 
 - (void)buildColumnOffsetsFromTop:(CGFloat) top
@@ -346,6 +379,7 @@ loadedIndices = _loadedIndices;
 		
 		CGSize headerSize = [self.headerView sizeThatFits:CGSizeMake(self.width, CGFLOAT_MAX)];
 		self.headerView.height = headerSize.height;
+		self.headerViewHeight = headerSize.height;
         top += self.headerView.height;
     }
     
