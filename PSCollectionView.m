@@ -478,9 +478,9 @@ headerViewHeight = _headerViewHeight;
 				[self addSubview:newView];
 				if (self.animateFirstCellAppearance) {
 					newView.alpha = 0.0f;
-					[UIView animateWithDuration:kAnimationDuration animations:^{
+					[UIView animateWithDuration:kAnimationDuration delay:0.0f options:UIViewAnimationOptionAllowUserInteraction animations:^{
 						newView.alpha = 1.0f;
-					}];
+					} completion:nil];
 				}
 			}
         
