@@ -24,7 +24,7 @@
 #import "PSCollectionView.h"
 #import "PSCollectionViewCell.h"
 
-#define kMargin 8.0
+#define kMargin 12.0
 
 static inline NSString * PSCollectionKeyForIndex(NSInteger index) {
     return [NSString stringWithFormat:@"%d", index];
@@ -115,7 +115,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 @property (nonatomic, assign, readwrite) NSInteger numCols;
 @property (nonatomic, assign) UIInterfaceOrientation orientation;
 
-@property (nonatomic, strong) NSMutableSet *reuseableViews;
+@property (nonatomic, strong) NSMutableDictionary *reuseableViews;
 @property (nonatomic, strong) NSMutableDictionary *visibleViews;
 @property (nonatomic, strong) NSMutableArray *viewKeysToRemove;
 @property (nonatomic, strong) NSMutableDictionary *indexToRectMap;
@@ -178,12 +178,27 @@ indexToRectMap = _indexToRectMap;
         self.numColsLandscape = 0;
         self.orientation = [UIApplication sharedApplication].statusBarOrientation;
         
-        self.reuseableViews = [NSMutableSet set];
+        self.reuseableViews = [NSMutableDictionary dictionary];
         self.visibleViews = [NSMutableDictionary dictionary];
         self.viewKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (void)awakeFromNib {
+    self.alwaysBounceVertical = YES;
+    
+    self.colWidth = 0.0;
+    self.numCols = 0;
+    self.numColsPortrait = 0;
+    self.numColsLandscape = 0;
+    self.orientation = [UIApplication sharedApplication].statusBarOrientation;
+    
+    self.reuseableViews = [NSMutableDictionary dictionary];
+    self.visibleViews = [NSMutableDictionary dictionary];
+    self.viewKeysToRemove = [NSMutableArray array];
+    self.indexToRectMap = [NSMutableDictionary dictionary];
 }
 
 - (void)dealloc {
@@ -401,11 +416,16 @@ indexToRectMap = _indexToRectMap;
 
 #pragma mark - Reusing Views
 
-- (PSCollectionViewCell *)dequeueReusableView {
-    PSCollectionViewCell *view = [self.reuseableViews anyObject];
+- (PSCollectionViewCell *)dequeueReusableView:(NSString *)identifier {
+    NSMutableSet *set = [self.reuseableViews objectForKey:identifier];
+    if (set == nil) {
+        set = [NSMutableSet set];
+        [self.reuseableViews setValue:set forKey:identifier];
+    }
+    PSCollectionViewCell *view = [set anyObject];
     if (view) {
         // Found a reusable view, remove it from the set
-        [self.reuseableViews removeObject:view];
+        [set removeObject:view];
     }
     
     return view;
@@ -416,7 +436,12 @@ indexToRectMap = _indexToRectMap;
         [view performSelector:@selector(prepareForReuse)];
     }
     view.frame = CGRectZero;
-    [self.reuseableViews addObject:view];
+    NSMutableSet *set = [self.reuseableViews objectForKey:view.identifier];
+    if (set != nil) {
+        set = [NSMutableSet set];
+        [self.reuseableViews setValue:set forKey:view.identifier];
+    }
+    [set addObject:view];
     [view removeFromSuperview];
 }
 

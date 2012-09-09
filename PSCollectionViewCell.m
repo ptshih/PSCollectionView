@@ -29,8 +29,8 @@
 
 @implementation PSCollectionViewCell
 
-@synthesize
-object = _object;
+@synthesize object = _object;
+@synthesize identifier = _identifier;
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];

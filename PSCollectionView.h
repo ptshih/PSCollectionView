@@ -55,7 +55,7 @@
  Dequeues a reusable view that was previously initialized
  This is similar to UITableView dequeueReusableCellWithIdentifier
  */
-- (UIView *)dequeueReusableView;
+- (UIView *)dequeueReusableView:(NSString *)identifier;
 
 @end
 
