@@ -29,8 +29,8 @@
 
 @implementation PSCollectionViewCell
 
-@synthesize
-object = _object;
+@synthesize object = _object;
+@synthesize identifier = _identifier;
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -39,10 +39,6 @@ object = _object;
     return self;
 }
 
-- (void)dealloc {
-    self.object = nil;
-    [super dealloc];
-}
 
 - (void)prepareForReuse {
 }
