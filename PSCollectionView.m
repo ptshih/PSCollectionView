@@ -444,18 +444,20 @@ headerViewHeight = _headerViewHeight;
         topIndex = 0;
         bottomIndex = numViews;
     } else {
-        NSArray *sortedKeys = [[self.visibleViews allKeys] sortedArrayUsingComparator:^(id obj1, id obj2) {
-            if ([obj1 integerValue] < [obj2 integerValue]) {
-                return (NSComparisonResult)NSOrderedAscending;
-            } else if ([obj1 integerValue] > [obj2 integerValue]) {
-                return (NSComparisonResult)NSOrderedDescending;
-            } else {
-                return (NSComparisonResult)NSOrderedSame;
-            }
-        }];
-        topIndex = [[sortedKeys objectAtIndex:0] integerValue];
-        bottomIndex = [[sortedKeys lastObject] integerValue];
-        
+		// need the highest and lowest values, so instead of an expensive sort, just iterate finding the high/low
+		NSArray *allKeys = [self.visibleViews allKeys];
+		topIndex = [[allKeys objectAtIndex:0] integerValue];
+		bottomIndex = [[allKeys objectAtIndex:0] integerValue];
+		[allKeys enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+			NSInteger value = [obj integerValue];
+			if (value < topIndex) {
+				topIndex = value;
+			}
+			if (value > bottomIndex) {
+				bottomIndex = value;
+			}
+		}];
+		
         topIndex = MAX(0, topIndex - (bufferViewFactor * self.numCols));
         bottomIndex = MIN(numViews, bottomIndex + (bufferViewFactor * self.numCols));
     }
