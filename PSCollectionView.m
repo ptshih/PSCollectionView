@@ -212,12 +212,47 @@ headerViewHeight = _headerViewHeight;
 #pragma mark - Setters
 
 - (void)setLoadingView:(UIView *)loadingView {
-    if (_loadingView && [_loadingView respondsToSelector:@selector(removeFromSuperview)]) {
+    if (_loadingView) {
         [_loadingView removeFromSuperview];
     }
     _loadingView = loadingView;
     
     [self addSubview:_loadingView];
+	
+	[self relayoutViews];
+}
+
+- (void)setEmptyView:(UIView *)emptyView {
+	if (_emptyView) {
+		[_emptyView removeFromSuperview];
+	}
+	_emptyView = emptyView;
+	
+	[self addSubview:_emptyView];
+	
+	[self relayoutViews];
+}
+
+- (void)setHeaderView:(UIView *)headerView {
+	if (_headerView) {
+		[_headerView removeFromSuperview];
+	}
+	_headerView = headerView;
+	
+	[self addSubview:_headerView];
+	
+	[self relayoutViews];
+}
+
+- (void)setFooterView:(UIView *)footerView {
+	if (_footerView) {
+		[_footerView removeFromSuperview];
+	}
+	_footerView = footerView;
+	
+	[self addSubview:_footerView];
+	
+	[self relayoutViews];
 }
 
 #pragma mark - DataSource
