@@ -170,20 +170,30 @@ indexToRectMap = _indexToRectMap;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.alwaysBounceVertical = YES;
-        
-        self.colWidth = 0.0;
-        self.numCols = 0;
-        self.numColsPortrait = 0;
-        self.numColsLandscape = 0;
-        self.orientation = [UIApplication sharedApplication].statusBarOrientation;
-        
-        self.reuseableViews = [NSMutableSet set];
-        self.visibleViews = [NSMutableDictionary dictionary];
-        self.viewKeysToRemove = [NSMutableArray array];
-        self.indexToRectMap = [NSMutableDictionary dictionary];
+        [self setup];
     }
     return self;
+}
+
+- (void)awakeFromNib
+{
+    [self setup];
+}
+
+- (void)setup
+{
+    self.alwaysBounceVertical = YES;
+    
+    self.colWidth = 0.0;
+    self.numCols = 0;
+    self.numColsPortrait = 0;
+    self.numColsLandscape = 0;
+    self.orientation = [UIApplication sharedApplication].statusBarOrientation;
+    
+    self.reuseableViews = [NSMutableSet set];
+    self.visibleViews = [NSMutableDictionary dictionary];
+    self.viewKeysToRemove = [NSMutableArray array];
+    self.indexToRectMap = [NSMutableDictionary dictionary];
 }
 
 - (void)dealloc {
