@@ -275,33 +275,14 @@ headerViewHeight = _headerViewHeight;
 		//determine if the header has changed height
 		CGSize headerSize = [self.headerView sizeThatFits:CGSizeMake(self.width, CGFLOAT_MAX)];
 		if (self.headerViewHeight != headerSize.height) {
-			//need to adjust all the cells and column heights to reflect the new header height
-			CGFloat delta = headerSize.height - self.headerViewHeight;
-			
 			self.headerView.height = headerSize.height;
 			self.headerViewHeight = headerSize.height;
 			
-			[self adjustYOffsetsWithDelta:delta];
+			//need to adjust all the cells and column heights to reflect the new header height
+			[self relayoutViews];
 		}
 		
 		[self removeAndAddCellsIfNecessary];
-	}
-}
-
-- (void)adjustYOffsetsWithDelta:(CGFloat)delta
-{
-	//adjust the column heights
-	for (int i = 0; i < self.numCols; i++) {
-		CGFloat colHeight = [[_colOffsets objectAtIndex:i] floatValue];
-		NSNumber *newOffset = [NSNumber numberWithFloat:colHeight + delta];
-		[_colOffsets replaceObjectAtIndex:i withObject:newOffset];
-	}
-	
-	//adjust all the cell positions
-	NSArray *visibleViewValues = _visibleViews.allValues;
-	for (UIView *visibleView in visibleViewValues) {
-		CGRect newFrame = CGRectOffset(visibleView.frame, 0, delta);
-		visibleView.frame = newFrame;
 	}
 }
 
