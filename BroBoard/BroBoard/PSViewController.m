@@ -110,7 +110,7 @@ collectionView = _collectionView;
         if (!error && responseCode == 200) {
             id res = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
             if (res && [res isKindOfClass:[NSDictionary class]]) {
-                self.items = [res objectForKey:@"gallery"];
+                self.items = [res objectForKey:@"data"];
                 [self dataSourceDidLoad];
             } else {
                 [self dataSourceDidError];
