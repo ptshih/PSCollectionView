@@ -396,7 +396,7 @@ headerViewHeight = _headerViewHeight;
 		CGSize headerSize = [self.headerView sizeThatFits:CGSizeMake(self.width, CGFLOAT_MAX)];
 		self.headerView.height = headerSize.height;
 		self.headerViewHeight = headerSize.height;
-        top += self.headerView.height;
+        top += self.headerView.height + self.margin;
     }
     
     if (numViews > 0) {
