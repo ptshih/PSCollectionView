@@ -421,7 +421,9 @@ headerViewHeight = _headerViewHeight;
         if (self.emptyView) {
             self.emptyView.frame = CGRectMake(self.margin, top, self.width - self.margin * 2, self.height - top - self.margin);
             [self addSubview:self.emptyView];
-        }
+        } else if (self.headerView) {
+			totalHeight = top;
+		}
     }
     
     totalHeight = [self updateFooterViewWithTotalHeight:totalHeight];
