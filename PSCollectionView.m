@@ -27,12 +27,56 @@
 #define kDefaultMargin 8.0
 #define kAnimationDuration 0.3f
 
-static inline NSNumber * PSCollectionKeyForIndex(NSInteger index) {
-	return [NSNumber numberWithInteger:index];
+@interface PSCollectionViewKey : NSObject <NSCopying>
+
+- (instancetype)initWithInteger:(NSInteger)integer;
++ (PSCollectionViewKey*)keyWithInteger:(NSInteger)integer;
+
+@property (nonatomic, assign) NSInteger key;
+
+@end
+
+@implementation PSCollectionViewKey
+
+- (id)copyWithZone:(NSZone *)zone
+{
+	PSCollectionViewKey *newKey = [[self class] allocWithZone:zone];
+    newKey.key = self.key;
+    return newKey;
 }
 
-static inline NSInteger PSCollectionIndexForKey(NSString *key) {
-    return [key integerValue];
+- (instancetype)initWithInteger:(NSInteger)integer
+{
+	self = [super init];
+	if (self) {
+		_key = integer;
+	}
+	return self;
+}
+
++ (PSCollectionViewKey*)keyWithInteger:(NSInteger)integer
+{
+	return [[PSCollectionViewKey alloc] initWithInteger:integer];
+}
+
+- (NSUInteger)hash
+{
+	return _key;
+}
+
+- (BOOL)isEqual:(id)object
+{
+	return _key == ((PSCollectionViewKey*)object).key;
+}
+
+@end
+
+static inline PSCollectionViewKey * PSCollectionKeyForIndex(NSInteger index) {
+	return [PSCollectionViewKey keyWithInteger:index];
+}
+
+static inline NSInteger PSCollectionIndexForKey(PSCollectionViewKey *key) {
+    return key.key;
 }
 
 #pragma mark - UIView Category
@@ -406,7 +450,7 @@ headerViewHeight = _headerViewHeight;
         // Calculate index to rect mapping
         self.colWidth = floorf((self.width - self.margin * (self.numCols + 1)) / self.numCols);
         for (NSInteger i = 0; i < numViews; i++) {
-            NSNumber *key = PSCollectionKeyForIndex(i);
+            PSCollectionViewKey *key = PSCollectionKeyForIndex(i);
             
             // Find the shortest column
             NSInteger col = [self findShortestColumn];
@@ -464,10 +508,10 @@ headerViewHeight = _headerViewHeight;
     } else {
 		// need the highest and lowest values, so instead of an expensive sort, just iterate finding the high/low
 		NSArray *allKeys = [self.visibleViews allKeys];
-		topIndex = [[allKeys objectAtIndex:0] integerValue];
-		bottomIndex = [[allKeys objectAtIndex:0] integerValue];
+		topIndex = [(PSCollectionViewKey*)[allKeys objectAtIndex:0] key];
+		bottomIndex = [(PSCollectionViewKey*)[allKeys objectAtIndex:0] key];
 		[allKeys enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-			NSInteger value = [obj integerValue];
+			NSInteger value = [(PSCollectionViewKey*)obj key];
 			if (value < topIndex) {
 				topIndex = value;
 			}
@@ -483,7 +527,7 @@ headerViewHeight = _headerViewHeight;
     
     // Add views
     for (NSInteger i = topIndex; i < bottomIndex; i++) {
-        NSNumber *key = PSCollectionKeyForIndex(i);
+        PSCollectionViewKey *key = PSCollectionKeyForIndex(i);
 		CGRect rect = [[self.indexToRectMap objectForKey:key] CGRectValue];
         
         // If view is within visible rect and is not already shown
@@ -524,7 +568,7 @@ headerViewHeight = _headerViewHeight;
 		//just build via a reload
 		[self reloadData];
 	} else {
-		NSNumber *key = PSCollectionKeyForIndex(numViews-1);
+		PSCollectionViewKey *key = PSCollectionKeyForIndex(numViews-1);
 		
 		// Find the shortest column
 		NSInteger col = [self findShortestColumn];
@@ -565,7 +609,7 @@ headerViewHeight = _headerViewHeight;
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
 	NSValue *rectValue = [NSValue valueWithCGRect:gestureRecognizer.view.frame];
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectValue];
-    NSString *key = [matchingKeys lastObject];
+    PSCollectionViewKey *key = [matchingKeys lastObject];
     if ([gestureRecognizer.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
         if (self.collectionViewDelegate && [self.collectionViewDelegate respondsToSelector:@selector(collectionView:didSelectView:atIndex:)]) {
             NSInteger matchingIndex = PSCollectionIndexForKey([matchingKeys lastObject]);
