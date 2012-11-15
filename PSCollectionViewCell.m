@@ -39,12 +39,9 @@ object = _object;
     return self;
 }
 
-- (void)dealloc {
-    self.object = nil;
-    [super dealloc];
-}
 
 - (void)prepareForReuse {
+	self.object = nil;
 }
 
 - (void)fillViewWithObject:(id)object {

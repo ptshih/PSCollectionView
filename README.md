@@ -32,9 +32,7 @@ It shows an example of using PSCollectionView and a subclass of PSCollectionView
 
 ARC
 ---
-PSCollectionView, by default, is not ARC ready.
-
-However, there is an 'arc' branch that has been converted for use with ARC projects.
+This version of PSCollectionView is ARC ready.
 
 How to use:
 ---
