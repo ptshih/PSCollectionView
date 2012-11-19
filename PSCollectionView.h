@@ -75,6 +75,6 @@
 @required
 - (NSInteger)numberOfViewsInCollectionView:(PSCollectionView *)collectionView;
 - (PSCollectionViewCell *)collectionView:(PSCollectionView *)collectionView viewAtIndex:(NSInteger)index;
-- (CGFloat)heightForViewAtIndex:(NSInteger)index;
+- (CGFloat)collectionView:(PSCollectionView *)collectionView heightForViewAtIndex:(NSInteger)index;
 
 @end

@@ -147,7 +147,7 @@ collectionView = _collectionView;
     return v;
 }
 
-- (CGFloat)heightForViewAtIndex:(NSInteger)index {
+- (CGFloat)collectionView:(PSCollectionView *)collectionView heightForViewAtIndex:(NSInteger)index {
     NSDictionary *item = [self.items objectAtIndex:index];
     
     return [PSBroView heightForViewWithObject:item inColumnWidth:self.collectionView.colWidth];
