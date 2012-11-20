@@ -144,6 +144,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 // Public Views
 @synthesize
 headerView = _headerView,
+sectionView = _sectionView,
 footerView = _footerView,
 emptyView = _emptyView,
 loadingView = _loadingView;
@@ -194,6 +195,7 @@ indexToRectMap = _indexToRectMap;
     
     // release retains
     self.headerView = nil;
+    self.sectionView = nil;
     self.footerView = nil;
     self.emptyView = nil;
     self.loadingView = nil;
@@ -235,6 +237,15 @@ indexToRectMap = _indexToRectMap;
     } else {
         [self removeAndAddCellsIfNecessary];
     }
+    
+    if (self.sectionView) {
+        CGFloat top = (self.headerView) ? self.headerView.top  + self.headerView.height : 0.0f;
+        if (self.contentOffset.y >= top) {
+            self.sectionView.top = self.contentOffset.y;
+        } else {
+            self.sectionView.top = top;
+        }
+    }
 }
 
 - (void)relayoutViews {
@@ -258,16 +269,24 @@ indexToRectMap = _indexToRectMap;
     NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
     
     CGFloat totalHeight = 0.0;
-    CGFloat top = kMargin;
+    CGFloat top = 0.0;
     
     // Add headerView if it exists
     if (self.headerView) {
-        self.headerView.top = kMargin;
+        self.headerView.top = 0;
         top = self.headerView.top;
         [self addSubview:self.headerView];
         top += self.headerView.height;
-        top += kMargin;
     }
+    
+    // Add sectionView
+    if (self.sectionView) {
+        self.sectionView.top = top;
+        [self addSubview:self.sectionView];
+        top = self.sectionView.top + self.sectionView.height;
+    }
+    
+    top += kMargin;
     
     if (numViews > 0) {
         // This array determines the last height offset on a column
@@ -400,7 +419,12 @@ indexToRectMap = _indexToRectMap;
             // Only add views if not visible
             PSCollectionViewCell *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
             newView.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
-            [self addSubview:newView];
+            if (self.sectionView) {
+                [self insertSubview:newView belowSubview:self.sectionView];
+            } else {
+                [self addSubview:newView];
+                
+            }
             
             // Setup gesture recognizer
             if ([newView.gestureRecognizers count] == 0) {

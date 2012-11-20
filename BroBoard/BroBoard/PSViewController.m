@@ -88,6 +88,27 @@ collectionView = _collectionView;
         self.collectionView.numColsLandscape = 3;
     }
     
+    UIView *sectionView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, 22.0f)];
+    [sectionView setBackgroundColor:[UIColor blackColor]];
+    [sectionView setAlpha:0.75f];
+    UILabel *sectionViewlabel = [[UILabel alloc] initWithFrame:sectionView.bounds];
+    [sectionViewlabel setTextColor:[UIColor whiteColor]];
+    [sectionViewlabel setBackgroundColor:[UIColor clearColor]];
+    [sectionViewlabel setText:@"I'm section view"];
+    [sectionViewlabel setTextAlignment:NSTextAlignmentCenter];
+    [sectionView addSubview:sectionViewlabel];
+    [self.collectionView setSectionView:sectionView];
+    
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.frame.size.width, 50.0f)];
+    [headerView setBackgroundColor:[UIColor orangeColor]];
+    UILabel *headerViewLabel = [[UILabel alloc] initWithFrame:sectionView.bounds];
+    [headerViewLabel setTextColor:[UIColor blackColor]];
+    [headerViewLabel setBackgroundColor:[UIColor clearColor]];
+    [headerViewLabel setText:@"I'm header view"];
+    [headerViewLabel setTextAlignment:NSTextAlignmentCenter];
+    [headerView addSubview:headerViewLabel];
+    [self.collectionView setHeaderView:headerView];
+    
     UILabel *loadingLabel = [[UILabel alloc] initWithFrame:self.collectionView.bounds];
     loadingLabel.text = @"Loading...";
     loadingLabel.textAlignment = UITextAlignmentCenter;
@@ -110,7 +131,7 @@ collectionView = _collectionView;
         if (!error && responseCode == 200) {
             id res = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
             if (res && [res isKindOfClass:[NSDictionary class]]) {
-                self.items = [res objectForKey:@"gallery"];
+                self.items = [res objectForKey:@"data"];
                 [self dataSourceDidLoad];
             } else {
                 [self dataSourceDidError];

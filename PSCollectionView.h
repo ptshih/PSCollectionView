@@ -32,6 +32,7 @@
 #pragma mark - Public Properties
 
 @property (nonatomic, retain) UIView *headerView;
+@property (nonatomic, retain) UIView *sectionView;
 @property (nonatomic, retain) UIView *footerView;
 @property (nonatomic, retain) UIView *emptyView;
 @property (nonatomic, retain) UIView *loadingView;
