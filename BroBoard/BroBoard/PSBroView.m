@@ -66,7 +66,12 @@ captionLabel = _captionLabel;
     // Image
     CGFloat objectWidth = [[self.object objectForKey:@"width"] floatValue];
     CGFloat objectHeight = [[self.object objectForKey:@"height"] floatValue];
-    CGFloat scaledHeight = floorf(objectHeight / (objectWidth / width));
+    CGFloat scaledHeight;
+    if (objectHeight == 0) {
+        scaledHeight = 0;
+    } else {
+        scaledHeight = floorf(objectHeight / (objectWidth / width));
+    }
     self.imageView.frame = CGRectMake(left, top, width, scaledHeight);
     
     // Label
@@ -98,7 +103,12 @@ captionLabel = _captionLabel;
     // Image
     CGFloat objectWidth = [[object objectForKey:@"width"] floatValue];
     CGFloat objectHeight = [[object objectForKey:@"height"] floatValue];
-    CGFloat scaledHeight = floorf(objectHeight / (objectWidth / width));
+    CGFloat scaledHeight;
+    if (objectHeight == 0) {
+        scaledHeight = 0;
+    } else {
+        scaledHeight = floorf(objectHeight / (objectWidth / width));
+    }
     height += scaledHeight;
     
     // Label
