@@ -33,8 +33,8 @@ How to use:
 ---
 Here's an example of creating an instance of PSCollectionView
 
-    self.collectionView = [[PSCollectionView alloc] initWithFrame:self.contentView.bounds];
-    self.collectionView.delegate = self;
+    self.collectionView = [[PSCollectionView alloc] initWithFrame:CGRectZero];
+    self.collectionView.delegate = self; // This is for UIScrollViewDelegate
     self.collectionView.collectionViewDelegate = self;
     self.collectionView.collectionViewDataSource = self;
     self.collectionView.backgroundColor = [UIColor clearColor];
@@ -60,6 +60,9 @@ Here's an example of creating an instance of PSCollectionView
 
     UIView *footerView = ...
     self.collectionView.footerView = footerView;
+    
+**Reloading Data**
+    [self.collectionView reloadData];
 
 **Delegate and DataSource**
 
