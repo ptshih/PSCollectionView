@@ -24,48 +24,32 @@ I use this in my iPhone/iPad app, Lunchbox.
 
 [<img src="http://a5.mzstatic.com/us/r1000/086/Purple/v4/b7/08/bb/b708bb3f-0775-67af-6765-e9f17e7384c4/mza_6463307710579208032.480x480-75.jpg" />](http://itunes.apple.com/us/app/lunchbox/id506544104?mt=8)
 
-Still confused? Try the Demo app included in this repo: BroBoard
----
-Just open and run in simulator, it works on both iPhone (2 columns) AND iPad (4 columns)
-
-It shows an example of using PSCollectionView and a subclass of PSCollectionViewCell
 
 ARC
 ---
-PSCollectionView, by default, is not ARC ready.
-
-However, there is an 'arc' branch that has been converted for use with ARC projects.
+Fully ARC compatible now
 
 How to use:
 ---
 Here's an example of creating an instance of PSCollectionView
 
-    self.collectionView = [[[PSCollectionView alloc] initWithFrame:self.view.bounds] autorelease];
+    self.collectionView = [[PSCollectionView alloc] initWithFrame:self.contentView.bounds];
     self.collectionView.delegate = self;
     self.collectionView.collectionViewDelegate = self;
     self.collectionView.collectionViewDataSource = self;
-    self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.collectionView.backgroundColor = [UIColor clearColor];
+    self.collectionView.autoresizingMask = ~UIViewAutoresizingNone;
 
 **Setting number of columns**
 
     // Specify number of columns for both iPhone and iPad
     if (isDeviceIPad()) {
-        self.collectionView.numColsPortrait = 4;
-        self.collectionView.numColsLandscape = 5;
+        self.collectionView.numColsPortrait = 3;
+        self.collectionView.numColsLandscape = 4;
     } else {
-        self.collectionView.numColsPortrait = 2;
-        self.collectionView.numColsLandscape = 3;
+        self.collectionView.numColsPortrait = 1;
+        self.collectionView.numColsLandscape = 2;
     }
-
-**Add a loading view or label**
-
-    UIView *loadingLabel = ...
-    self.collectionView.loadingView = loadingLabel;
-
-**Add an empty/error view or label**
-
-    UIView *emptyView = ...
-    self.collectionView.emptyView = emptyView;
 
 **Add a header view**
 
@@ -79,29 +63,20 @@ Here's an example of creating an instance of PSCollectionView
 
 **Delegate and DataSource**
 
-    - (PSCollectionViewCell *)collectionView:(PSCollectionView *)collectionView viewAtIndex:(NSInteger)index {
-        NSDictionary *item = [self.items objectAtIndex:index];
-        
-        // You should probably subclass PSCollectionViewCell
-        PSCollectionViewCell *v = (PSCollectionViewCell *)[self.collectionView dequeueReusableView];
-        if (!v) {
-            v = [[[PSCollectionViewCell alloc] initWithFrame:CGRectZero] autorelease];
-        }
-        
-        [v fillViewWithObject:item]
-        
-        return v;
+    - (Class)collectionView:(PSCollectionView *)collectionView cellClassForRowAtIndex:(NSInteger)index {
+        return [PSCollectionViewCell class];
     }
 
-    - (CGFloat)heightForViewAtIndex:(NSInteger)index {
-        NSDictionary *item = [self.items objectAtIndex:index];
-
-        // You should probably subclass PSCollectionViewCell
-        return [PSCollectionViewCell heightForViewWithObject:item inColumnWidth:self.collectionView.colWidth];
+    - (NSInteger)numberOfRowsInCollectionView:(PSCollectionView *)collectionView {
+        return 0;
     }
 
-    - (void)collectionView:(PSCollectionView *)collectionView didSelectView:(PSCollectionViewCell *)view atIndex:(NSInteger)index {
-        // Do something with the tap
+    - (UIView *)collectionView:(PSCollectionView *)collectionView cellForRowAtIndex:(NSInteger)index {
+        return nil;
+    }
+
+    - (CGFloat)collectionView:(PSCollectionView *)collectionView heightForRowAtIndex:(NSInteger)index {
+        return 0.0;
     }
 
 License
