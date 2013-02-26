@@ -23,12 +23,16 @@
 
 #import <UIKit/UIKit.h>
 
+@class PSCollectionView;
+
 @interface PSCollectionViewCell : UIView
 
-@property (nonatomic, retain) id object;
+@property (nonatomic, strong) id object;
+@property (nonatomic, weak) PSCollectionView *collectionView;
+@property (nonatomic, assign) NSInteger index;
 
 - (void)prepareForReuse;
-- (void)fillViewWithObject:(id)object;
-+ (CGFloat)heightForViewWithObject:(id)object inColumnWidth:(CGFloat)columnWidth;
+- (void)collectionView:(PSCollectionView *)collectionView fillCellWithObject:(id)object atIndex:(NSInteger)index;
++ (CGFloat)rowHeightForObject:(id)object inColumnWidth:(CGFloat)columnWidth;
 
 @end
