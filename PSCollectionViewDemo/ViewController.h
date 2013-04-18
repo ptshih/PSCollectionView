@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PSCollectionView.h"
+#import "AppDelegate.h"
+#import "JSONKit.h"
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController <UIScrollViewDelegate, PSCollectionViewDataSource, PSCollectionViewDelegate> {
+    PSCollectionView *waterflowView;
+}
+
+@property (nonatomic, retain) PSCollectionView *waterflowView;
 
 @end

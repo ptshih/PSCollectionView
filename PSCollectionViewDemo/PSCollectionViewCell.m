@@ -42,8 +42,9 @@
 
 - (void)collectionView:(PSCollectionView *)collectionView fillCellWithObject:(id)object atIndex:(NSInteger)index {
     self.collectionView = collectionView;
-    self.object = object;
+    //self.object = object;
     self.index = index;
+    self.object = [object objectAtIndex:index]; // 调用接口传递的 object 是数组，但是 waterflowViewCell.m 中 layoutSubviews 中 object 应该是数组中的一个字典
 }
 
 + (CGFloat)rowHeightForObject:(id)object inColumnWidth:(CGFloat)columnWidth {
