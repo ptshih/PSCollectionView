@@ -23,7 +23,7 @@
 
 #import "PSCollectionView.h"
 
-#define kMargin 8.0
+#define kDefaultMargin 8.0
 
 static inline NSString * PSCollectionKeyForIndex(NSInteger index) {
     return [NSString stringWithFormat:@"%d", index];
@@ -150,6 +150,8 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     if (self) {
         self.alwaysBounceVertical = YES;
         
+        self.cellMargin = kDefaultMargin;
+        
         self.lastOffset = 0.0;
         self.offsetThreshold = floorf(self.height / 4.0);
         
@@ -224,7 +226,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     NSInteger numViews = [self.collectionViewDataSource numberOfRowsInCollectionView:self];
     
     CGFloat totalHeight = 0.0;
-    CGFloat top = kMargin;
+    CGFloat top = self.cellMargin;
     
     // Add headerView if it exists
     if (self.headerView) {
@@ -242,7 +244,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
         }
         
         // Calculate index to rect mapping
-        self.colWidth = floorf((self.width - kMargin * (self.numCols + 1)) / self.numCols);
+        self.colWidth = floorf((self.width - self.cellMargin * (self.numCols + 1)) / self.numCols);
         for (NSInteger i = 0; i < numViews; i++) {
             NSString *key = PSCollectionKeyForIndex(i);
             
@@ -258,7 +260,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
                 }
             }
             
-            CGFloat left = kMargin + (col * kMargin) + (col * self.colWidth);
+            CGFloat left = self.cellMargin + (col * self.cellMargin) + (col * self.colWidth);
             CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
             CGFloat colHeight = [self.collectionViewDataSource collectionView:self heightForRowAtIndex:i];
             
@@ -268,7 +270,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
             [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
             
             // Update the last height offset for this column
-            CGFloat heightOffset = colHeight > 0 ? top + colHeight + kMargin : top;
+            CGFloat heightOffset = colHeight > 0 ? top + colHeight + self.cellMargin : top;
             
             [colOffsets replaceObjectAtIndex:col withObject:[NSNumber numberWithFloat:heightOffset]];
         }
