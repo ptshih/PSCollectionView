@@ -148,25 +148,38 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.alwaysBounceVertical = YES;
-        
-        self.cellMargin = kDefaultMargin;
-        
-        self.lastOffset = 0.0;
-        self.offsetThreshold = floorf(self.height / 4.0);
-        
-        self.colWidth = 0.0;
-        self.numCols = 0;
-        self.numColsPortrait = 0;
-        self.numColsLandscape = 0;
-        self.orientation = [UIApplication sharedApplication].statusBarOrientation;
-        
-        self.reuseableViews = [NSMutableDictionary dictionary];
-        self.visibleViews = [NSMutableDictionary dictionary];
-        self.viewKeysToRemove = [NSMutableArray array];
-        self.indexToRectMap = [NSMutableDictionary dictionary];
+
+        [self initialize];
     }
     return self;
+}
+
+- (void)awakeFromNib {
+    
+    [super awakeFromNib];
+    
+    [self initialize];
+}
+
+- (void)initialize {
+    
+    self.alwaysBounceVertical = YES;
+    
+    self.cellMargin = kDefaultMargin;
+    
+    self.lastOffset = 0.0;
+    self.offsetThreshold = floorf(self.height / 4.0);
+    
+    self.colWidth = 0.0;
+    self.numCols = 0;
+    self.numColsPortrait = 0;
+    self.numColsLandscape = 0;
+    self.orientation = [UIApplication sharedApplication].statusBarOrientation;
+    
+    self.reuseableViews = [NSMutableDictionary dictionary];
+    self.visibleViews = [NSMutableDictionary dictionary];
+    self.viewKeysToRemove = [NSMutableArray array];
+    self.indexToRectMap = [NSMutableDictionary dictionary];
 }
 
 - (void)dealloc {
