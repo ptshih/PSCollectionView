@@ -265,7 +265,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
             CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
             
             // Add to index rect map
-            [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
+            [self.indexToRectMap setObject:NSStringFromCGRect(CGRectIntegral(viewRect)) forKey:key];
             
             // Update the last height offset for this column
             CGFloat heightOffset = colHeight > 0 ? top + colHeight + kMargin : top;
@@ -406,7 +406,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 #pragma mark - Gesture Recognizer
 
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
+    NSString *rectString = NSStringFromCGRect((gestureRecognizer.view.frame));
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
     NSString *key = [matchingKeys lastObject];
     if ([gestureRecognizer.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
@@ -420,7 +420,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     if (![gestureRecognizer isMemberOfClass:[PSCollectionViewTapGestureRecognizer class]]) return YES;
     
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
+    NSString *rectString = NSStringFromCGRect(CGRectIntegral(gestureRecognizer.view.frame));
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
     NSString *key = [matchingKeys lastObject];
     
