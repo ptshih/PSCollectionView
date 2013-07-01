@@ -406,7 +406,6 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     if ([view respondsToSelector:@selector(prepareForReuse)]) {
         [view performSelector:@selector(prepareForReuse)];
     }
-    view.frame = CGRectZero;
     
     NSString *identifier = NSStringFromClass([view class]);
     if (![self.reuseableViews objectForKey:identifier]) {
