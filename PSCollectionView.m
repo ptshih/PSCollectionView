@@ -141,7 +141,10 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @end
 
-@implementation PSCollectionView
+@implementation PSCollectionView {
+    
+    CGFloat _contentHeight;
+}
 
 #pragma mark - Init/Memory
 
@@ -187,6 +190,16 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     self.delegate = nil;
     self.collectionViewDataSource = nil;
     self.collectionViewDelegate = nil;
+}
+
+#pragma mark - UIScrollView properties override
+
+// this is to avoid wrong content sizes when the system try to applay layout rules to the view
+- (void)setContentSize:(CGSize)contentSize {
+    
+    if (contentSize.height == _contentHeight) {
+        [super setContentSize:contentSize];
+    }
 }
 
 #pragma mark - DataSource
@@ -303,7 +316,10 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
         totalHeight += self.footerView.height;
     }
     
-    self.contentSize = CGSizeMake(self.width, totalHeight);
+    _contentHeight = totalHeight;
+    self.contentSize = CGSizeMake(self.width, _contentHeight);
+    
+    NSLog(@"relayout size %f", self.contentSize.height);
     
     [self removeAndAddCellsIfNecessary];
     
