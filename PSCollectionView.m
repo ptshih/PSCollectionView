@@ -270,7 +270,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
         }
         
         // Calculate index to rect mapping
-        self.colWidth = floorf((self.width - self.cellMargin * (self.numCols + 1)) / self.numCols);
+        self.colWidth = (self.width - self.cellMargin * (self.numCols + 1)) / self.numCols;
         for (NSInteger i = 0; i < numViews; i++) {
             NSString *key = PSCollectionKeyForIndex(i);
             
@@ -318,9 +318,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     
     _contentHeight = totalHeight;
     self.contentSize = CGSizeMake(self.width, _contentHeight);
-    
-    NSLog(@"relayout size %f", self.contentSize.height);
-    
+        
     [self removeAndAddCellsIfNecessary];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPSCollectionViewDidRelayoutNotification object:self];
