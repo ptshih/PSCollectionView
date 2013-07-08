@@ -386,9 +386,20 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
             [self addSubview:newCell];
             
             // Setup gesture recognizer
-            if ([newCell.gestureRecognizers count] == 0) {
+            if (![self cellHasTapGesture:newCell]) {
                 PSCollectionViewTapGestureRecognizer *gr = [[PSCollectionViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)];
+                gr.numberOfTapsRequired = 1;
                 gr.delegate = self;
+
+                // to avoid conflicts with other tap gestures with an higher number of taps
+                for (UITapGestureRecognizer *gesture in newCell.gestureRecognizers) {
+                    if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {
+                        if (gesture.numberOfTapsRequired > gr.numberOfTapsRequired) {
+                            [gr requireGestureRecognizerToFail:gesture];
+                        }
+                    }
+                }
+                
                 [newCell addGestureRecognizer:gr];
                 newCell.userInteractionEnabled = YES;
             }
@@ -457,6 +468,20 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     } else {
         return NO;
     }
+}
+
+- (BOOL)cellHasTapGesture:(PSCollectionViewCell*)cell {
+    
+    BOOL hasTapGesture = FALSE;
+    
+    for (PSCollectionViewTapGestureRecognizer *gesture in cell.gestureRecognizers) {
+        if ([gesture isKindOfClass:[PSCollectionViewTapGestureRecognizer class]]) {
+            hasTapGesture = TRUE;
+            break;
+        }
+    }
+    
+    return hasTapGesture;
 }
 
 @end
