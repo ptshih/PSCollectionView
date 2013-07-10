@@ -431,7 +431,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     if ([view respondsToSelector:@selector(prepareForReuse)]) {
         [view performSelector:@selector(prepareForReuse)];
     }
-    
+
     NSString *identifier = NSStringFromClass([view class]);
     if (![self.reuseableViews objectForKey:identifier]) {
         [self.reuseableViews setObject:[NSMutableSet set] forKey:identifier];
@@ -459,15 +459,8 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     if (![gestureRecognizer isMemberOfClass:[PSCollectionViewTapGestureRecognizer class]]) return YES;
     
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
-    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
-    NSString *key = [matchingKeys lastObject];
-    
-    if ([touch.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
-        return YES;
-    } else {
-        return NO;
-    }
+    return YES;
+
 }
 
 - (BOOL)cellHasTapGesture:(PSCollectionViewCell*)cell {
