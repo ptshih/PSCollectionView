@@ -457,10 +457,17 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    
     if (![gestureRecognizer isMemberOfClass:[PSCollectionViewTapGestureRecognizer class]]) return YES;
     
-    return YES;
-
+    BOOL shouldReceive = TRUE;
+    
+    PSCollectionViewCell *cell = (PSCollectionViewCell*)gestureRecognizer.view;
+    if ([cell respondsToSelector:@selector(gestureEnabled)]) {
+        shouldReceive = [cell gestureEnabled];
+    }
+    
+    return shouldReceive;
 }
 
 - (BOOL)cellHasTapGesture:(PSCollectionViewCell*)cell {

@@ -29,13 +29,22 @@
 
 @implementation PSCollectionViewCell
 
+@synthesize gestureEnabled = _gestureEnabled;
+
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+ 
+        _gestureEnabled = TRUE;
     }
     return self;
 }
 
+- (void)awakeFromNib {
+    
+    [super awakeFromNib];
+    _gestureEnabled = TRUE;
+}
 
 - (void)prepareForReuse {
 }
