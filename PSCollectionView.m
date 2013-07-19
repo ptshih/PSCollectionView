@@ -146,6 +146,9 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     CGFloat _contentHeight;
 }
 
+@synthesize headerView = _headerView;
+@synthesize footerView = _footerView;
+
 #pragma mark - Init/Memory
 
 - (id)initWithFrame:(CGRect)frame {
@@ -190,6 +193,30 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     self.delegate = nil;
     self.collectionViewDataSource = nil;
     self.collectionViewDelegate = nil;
+}
+
+#pragma mark - Properties override methods {
+
+- (void)setHeaderView:(UIView *)headerView {
+    
+    if (_headerView == headerView) {
+        return;
+    }
+    
+    [_headerView removeFromSuperview];
+    _headerView = headerView;
+    [self relayoutViews];
+}
+
+- (void)setFooterView:(UIView *)footerView {
+    
+    if (_footerView == footerView) {
+        return;
+    }
+    
+    [_footerView removeFromSuperview];
+    _footerView = footerView;
+    [self relayoutViews];
 }
 
 #pragma mark - UIScrollView properties override
