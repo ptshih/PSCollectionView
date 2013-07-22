@@ -232,10 +232,26 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 #pragma mark - DataSource
 
 - (void)reloadData {
+    
+    [self clearSubviews];
     [self relayoutViews];
 }
 
 #pragma mark - View
+
+- (void)clearSubviews {
+    
+    for (PSCollectionViewCell *cell in self.subviews) {
+        
+        if ([cell isKindOfClass:[PSCollectionViewCell class]]) {
+            [self enqueueReusableView:cell];
+        }
+    }
+    
+    [self.visibleViews removeAllObjects];
+    [self.viewKeysToRemove removeAllObjects];
+    [self.indexToRectMap removeAllObjects];
+}
 
 - (void)layoutSubviews {
     [super layoutSubviews];
