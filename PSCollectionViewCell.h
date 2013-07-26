@@ -25,7 +25,7 @@
 
 @class PSCollectionView;
 
-@interface PSCollectionViewCell : UIView
+@interface PSCollectionViewCell : UIControl
 
 @property (nonatomic, strong) id object;
 @property (nonatomic, weak) PSCollectionView *collectionView;
