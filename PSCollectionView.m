@@ -2,17 +2,17 @@
 // PSCollectionView.m
 //
 // Copyright (c) 2012 Peter Shih (http://petershih.com)
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -154,7 +154,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-
+        
         [self initialize];
     }
     return self;
@@ -329,11 +329,11 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
                 }
             }
             
-            CGFloat left = self.cellMargin + (col * self.cellMargin) + (col * self.colWidth);
-            CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
-            CGFloat colHeight = [self.collectionViewDataSource collectionView:self heightForRowAtIndex:i];
+            CGFloat left = (int)(self.cellMargin + (col * self.cellMargin) + (col * self.colWidth));
+            CGFloat top = (int)[[colOffsets objectAtIndex:col] floatValue];
+            CGFloat colHeight = (int)[self.collectionViewDataSource collectionView:self heightForRowAtIndex:i];
             
-            CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
+            CGRect viewRect = CGRectMake(left, top, (int)self.colWidth, colHeight);
             
             // Add to index rect map
             [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
@@ -361,7 +361,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     
     _contentHeight = totalHeight;
     self.contentSize = CGSizeMake(self.width, _contentHeight);
-        
+    
     [self removeAndAddCellsIfNecessary];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPSCollectionViewDidRelayoutNotification object:self];
@@ -433,7 +433,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
                 PSCollectionViewTapGestureRecognizer *gr = [[PSCollectionViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)];
                 gr.numberOfTapsRequired = 1;
                 gr.delegate = self;
-
+                
                 // to avoid conflicts with other tap gestures with an higher number of taps
                 for (UITapGestureRecognizer *gesture in newCell.gestureRecognizers) {
                     if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {
@@ -474,7 +474,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     if ([view respondsToSelector:@selector(prepareForReuse)]) {
         [view performSelector:@selector(prepareForReuse)];
     }
-
+    
     NSString *identifier = NSStringFromClass([view class]);
     if (![self.reuseableViews objectForKey:identifier]) {
         [self.reuseableViews setObject:[NSMutableSet set] forKey:identifier];
@@ -488,6 +488,12 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 #pragma mark - Gesture Recognizer
 
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
+    CGRect frame = gestureRecognizer.view.frame;
+    frame.origin.x = (int)frame.origin.x;
+    frame.origin.y = (int)frame.origin.y;
+    frame.size.width = (int)frame.size.width;
+    frame.size.height = (int)frame.size.height;
+    
     NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
     NSString *key = [matchingKeys lastObject];
