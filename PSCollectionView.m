@@ -2,17 +2,17 @@
 // PSCollectionView.m
 //
 // Copyright (c) 2012 Peter Shih (http://petershih.com)
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,11 +25,11 @@
 
 #define kDefaultMargin 8.0
 
-static inline NSString * PSCollectionKeyForIndex(NSInteger index) {
-    return [NSString stringWithFormat:@"%d", index];
+static inline NSNumber * PSCollectionKeyForIndex(NSInteger index) {
+    return [NSNumber numberWithInteger:index];
 }
 
-static inline NSInteger PSCollectionIndexForKey(NSString *key) {
+static inline NSInteger PSCollectionIndexForKey(NSNumber *key) {
     return [key integerValue];
 }
 
@@ -154,7 +154,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-
+        
         [self initialize];
     }
     return self;
@@ -315,7 +315,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
         // Calculate index to rect mapping
         self.colWidth = (self.width - self.cellMargin * (self.numCols + 1)) / self.numCols;
         for (NSInteger i = 0; i < numViews; i++) {
-            NSString *key = PSCollectionKeyForIndex(i);
+            NSNumber *key = PSCollectionKeyForIndex(i);
             
             // Find the shortest column
             NSInteger col = 0;
@@ -334,9 +334,9 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
             CGFloat colHeight = [self.collectionViewDataSource collectionView:self heightForRowAtIndex:i];
             
             CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
-            
             // Add to index rect map
-            [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
+            
+            [self.indexToRectMap setObject:[NSValue valueWithCGRect:viewRect] forKey:key];
             
             // Update the last height offset for this column
             CGFloat heightOffset = colHeight > 0 ? top + colHeight + self.cellMargin : top;
@@ -361,7 +361,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     
     _contentHeight = totalHeight;
     self.contentSize = CGSizeMake(self.width, _contentHeight);
-        
+    
     [self removeAndAddCellsIfNecessary];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPSCollectionViewDidRelayoutNotification object:self];
@@ -418,14 +418,14 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     
     // Add views
     for (NSInteger i = topIndex; i < bottomIndex; i++) {
-        NSString *key = PSCollectionKeyForIndex(i);
-        CGRect rect = CGRectFromString([self.indexToRectMap objectForKey:key]);
+        NSNumber *key = PSCollectionKeyForIndex(i);
+        CGRect rect = [[self.indexToRectMap objectForKey:key] CGRectValue];
         
         // If view is within visible rect and is not already shown
         if (![self.visibleViews objectForKey:key] && CGRectIntersectsRect(visibleRect, rect)) {
             // Only add views if not visible
             PSCollectionViewCell *newCell = [self.collectionViewDataSource collectionView:self cellForRowAtIndex:i];
-            newCell.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
+            newCell.frame = [[self.indexToRectMap objectForKey:key] CGRectValue];
             [self addSubview:newCell];
             
             // Setup gesture recognizer
@@ -433,7 +433,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
                 PSCollectionViewTapGestureRecognizer *gr = [[PSCollectionViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)];
                 gr.numberOfTapsRequired = 1;
                 gr.delegate = self;
-
+                
                 // to avoid conflicts with other tap gestures with an higher number of taps
                 for (UITapGestureRecognizer *gesture in newCell.gestureRecognizers) {
                     if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {
@@ -474,7 +474,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     if ([view respondsToSelector:@selector(prepareForReuse)]) {
         [view performSelector:@selector(prepareForReuse)];
     }
-
+    
     NSString *identifier = NSStringFromClass([view class]);
     if (![self.reuseableViews objectForKey:identifier]) {
         [self.reuseableViews setObject:[NSMutableSet set] forKey:identifier];
@@ -488,7 +488,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 #pragma mark - Gesture Recognizer
 
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
+    NSValue *rectString = [NSValue valueWithCGRect:gestureRecognizer.view.frame];
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
     NSString *key = [matchingKeys lastObject];
     if ([gestureRecognizer.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
