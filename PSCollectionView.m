@@ -329,11 +329,13 @@ static inline NSInteger PSCollectionIndexForKey(NSNumber *key) {
                 }
             }
             
-            CGFloat left = self.cellMargin + (col * self.cellMargin) + (col * self.colWidth);
-            CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
-            CGFloat colHeight = [self.collectionViewDataSource collectionView:self heightForRowAtIndex:i];
+            CGFloat left = (int)(self.cellMargin + (col * self.cellMargin) + (col * self.colWidth));
+            CGFloat top = (int)[[colOffsets objectAtIndex:col] floatValue];
+            CGFloat colHeight = (int)[self.collectionViewDataSource collectionView:self heightForRowAtIndex:i];
             
-            CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
+
+            CGRect viewRect = CGRectMake(left, top, (int)self.colWidth, colHeight);
+            
             // Add to index rect map
             
             [self.indexToRectMap setObject:[NSValue valueWithCGRect:viewRect] forKey:key];
@@ -488,7 +490,14 @@ static inline NSInteger PSCollectionIndexForKey(NSNumber *key) {
 #pragma mark - Gesture Recognizer
 
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
-    NSValue *rectString = [NSValue valueWithCGRect:gestureRecognizer.view.frame];
+
+    CGRect frame = gestureRecognizer.view.frame;
+    frame.origin.x = (int)frame.origin.x;
+    frame.origin.y = (int)frame.origin.y;
+    frame.size.width = (int)frame.size.width;
+    frame.size.height = (int)frame.size.height;
+    
+    NSValue *rectString = [NSValue valueWithCGRect:frame];
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
     NSString *key = [matchingKeys lastObject];
     if ([gestureRecognizer.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
