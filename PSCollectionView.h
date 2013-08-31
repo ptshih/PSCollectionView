@@ -41,8 +41,9 @@
 @property (nonatomic, assign, readonly) NSInteger numCols;
 @property (nonatomic, assign) NSInteger numColsLandscape;
 @property (nonatomic, assign) NSInteger numColsPortrait;
-@property (nonatomic, unsafe_unretained) id <PSCollectionViewDelegate> collectionViewDelegate;
-@property (nonatomic, unsafe_unretained) id <PSCollectionViewDataSource> collectionViewDataSource;
+@property (nonatomic, assign) CGFloat   cellMargin;
+@property (nonatomic, unsafe_unretained) IBOutlet id <PSCollectionViewDelegate> collectionViewDelegate;
+@property (nonatomic, unsafe_unretained) IBOutlet id <PSCollectionViewDataSource> collectionViewDataSource;
 
 #pragma mark - Public Methods
 

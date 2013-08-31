@@ -25,11 +25,12 @@
 
 @class PSCollectionView;
 
-@interface PSCollectionViewCell : UIView
+@interface PSCollectionViewCell : UIControl
 
 @property (nonatomic, strong) id object;
 @property (nonatomic, weak) PSCollectionView *collectionView;
 @property (nonatomic, assign) NSInteger index;
+@property (nonatomic, assign) BOOL gestureEnabled;
 
 - (void)prepareForReuse;
 - (void)collectionView:(PSCollectionView *)collectionView fillCellWithObject:(id)object atIndex:(NSInteger)index;

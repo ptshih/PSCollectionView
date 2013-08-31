@@ -2,17 +2,17 @@
 // PSCollectionView.m
 //
 // Copyright (c) 2012 Peter Shih (http://petershih.com)
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,13 +23,13 @@
 
 #import "PSCollectionView.h"
 
-#define kMargin 8.0
+#define kDefaultMargin 8.0
 
-static inline NSString * PSCollectionKeyForIndex(NSInteger index) {
-    return [NSString stringWithFormat:@"%d", index];
+static inline NSNumber * PSCollectionKeyForIndex(NSInteger index) {
+    return [NSNumber numberWithInteger:index];
 }
 
-static inline NSInteger PSCollectionIndexForKey(NSString *key) {
+static inline NSInteger PSCollectionIndexForKey(NSNumber *key) {
     return [key integerValue];
 }
 
@@ -141,30 +141,51 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @end
 
-@implementation PSCollectionView
+@implementation PSCollectionView {
+    
+    CGFloat _contentHeight;
+}
+
+@synthesize headerView = _headerView;
+@synthesize footerView = _footerView;
 
 #pragma mark - Init/Memory
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.alwaysBounceVertical = YES;
         
-        self.lastOffset = 0.0;
-        self.offsetThreshold = floorf(self.height / 4.0);
-        
-        self.colWidth = 0.0;
-        self.numCols = 0;
-        self.numColsPortrait = 0;
-        self.numColsLandscape = 0;
-        self.orientation = [UIApplication sharedApplication].statusBarOrientation;
-        
-        self.reuseableViews = [NSMutableDictionary dictionary];
-        self.visibleViews = [NSMutableDictionary dictionary];
-        self.viewKeysToRemove = [NSMutableArray array];
-        self.indexToRectMap = [NSMutableDictionary dictionary];
+        [self initialize];
     }
     return self;
+}
+
+- (void)awakeFromNib {
+    
+    [super awakeFromNib];
+    
+    [self initialize];
+}
+
+- (void)initialize {
+    
+    self.alwaysBounceVertical = YES;
+    
+    self.cellMargin = kDefaultMargin;
+    
+    self.lastOffset = 0.0;
+    self.offsetThreshold = floorf(self.height / 4.0);
+    
+    self.colWidth = 0.0;
+    self.numCols = 0;
+    self.numColsPortrait = 0;
+    self.numColsLandscape = 0;
+    self.orientation = [UIApplication sharedApplication].statusBarOrientation;
+    
+    self.reuseableViews = [NSMutableDictionary dictionary];
+    self.visibleViews = [NSMutableDictionary dictionary];
+    self.viewKeysToRemove = [NSMutableArray array];
+    self.indexToRectMap = [NSMutableDictionary dictionary];
 }
 
 - (void)dealloc {
@@ -174,13 +195,63 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     self.collectionViewDelegate = nil;
 }
 
+#pragma mark - Properties override methods {
+
+- (void)setHeaderView:(UIView *)headerView {
+    
+    if (_headerView == headerView) {
+        return;
+    }
+    
+    [_headerView removeFromSuperview];
+    _headerView = headerView;
+    [self relayoutViews];
+}
+
+- (void)setFooterView:(UIView *)footerView {
+    
+    if (_footerView == footerView) {
+        return;
+    }
+    
+    [_footerView removeFromSuperview];
+    _footerView = footerView;
+    [self relayoutViews];
+}
+
+#pragma mark - UIScrollView properties override
+
+// this is to avoid wrong content sizes when the system try to applay layout rules to the view
+- (void)setContentSize:(CGSize)contentSize {
+    
+    if (contentSize.height == _contentHeight) {
+        [super setContentSize:contentSize];
+    }
+}
+
 #pragma mark - DataSource
 
 - (void)reloadData {
+    
+    [self clearSubviews];
     [self relayoutViews];
 }
 
 #pragma mark - View
+
+- (void)clearSubviews {
+    
+    for (PSCollectionViewCell *cell in self.subviews) {
+        
+        if ([cell isKindOfClass:[PSCollectionViewCell class]]) {
+            [self enqueueReusableView:cell];
+        }
+    }
+    
+    [self.visibleViews removeAllObjects];
+    [self.viewKeysToRemove removeAllObjects];
+    [self.indexToRectMap removeAllObjects];
+}
 
 - (void)layoutSubviews {
     [super layoutSubviews];
@@ -224,7 +295,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     NSInteger numViews = [self.collectionViewDataSource numberOfRowsInCollectionView:self];
     
     CGFloat totalHeight = 0.0;
-    CGFloat top = kMargin;
+    CGFloat top = self.cellMargin;
     
     // Add headerView if it exists
     if (self.headerView) {
@@ -242,9 +313,9 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
         }
         
         // Calculate index to rect mapping
-        self.colWidth = floorf((self.width - kMargin * (self.numCols + 1)) / self.numCols);
+        self.colWidth = (self.width - self.cellMargin * (self.numCols + 1)) / self.numCols;
         for (NSInteger i = 0; i < numViews; i++) {
-            NSString *key = PSCollectionKeyForIndex(i);
+            NSNumber *key = PSCollectionKeyForIndex(i);
             
             // Find the shortest column
             NSInteger col = 0;
@@ -258,17 +329,19 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
                 }
             }
             
-            CGFloat left = kMargin + (col * kMargin) + (col * self.colWidth);
-            CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
-            CGFloat colHeight = [self.collectionViewDataSource collectionView:self heightForRowAtIndex:i];
+            CGFloat left = (int)(self.cellMargin + (col * self.cellMargin) + (col * self.colWidth));
+            CGFloat top = (int)[[colOffsets objectAtIndex:col] floatValue];
+            CGFloat colHeight = (int)[self.collectionViewDataSource collectionView:self heightForRowAtIndex:i];
             
-            CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
+
+            CGRect viewRect = CGRectMake(left, top, (int)self.colWidth, colHeight);
             
             // Add to index rect map
-            [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
+            
+            [self.indexToRectMap setObject:[NSValue valueWithCGRect:viewRect] forKey:key];
             
             // Update the last height offset for this column
-            CGFloat heightOffset = colHeight > 0 ? top + colHeight + kMargin : top;
+            CGFloat heightOffset = colHeight > 0 ? top + colHeight + self.cellMargin : top;
             
             [colOffsets replaceObjectAtIndex:col withObject:[NSNumber numberWithFloat:heightOffset]];
         }
@@ -288,7 +361,8 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
         totalHeight += self.footerView.height;
     }
     
-    self.contentSize = CGSizeMake(self.width, totalHeight);
+    _contentHeight = totalHeight;
+    self.contentSize = CGSizeMake(self.width, _contentHeight);
     
     [self removeAndAddCellsIfNecessary];
     
@@ -346,20 +420,31 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     
     // Add views
     for (NSInteger i = topIndex; i < bottomIndex; i++) {
-        NSString *key = PSCollectionKeyForIndex(i);
-        CGRect rect = CGRectFromString([self.indexToRectMap objectForKey:key]);
+        NSNumber *key = PSCollectionKeyForIndex(i);
+        CGRect rect = [[self.indexToRectMap objectForKey:key] CGRectValue];
         
         // If view is within visible rect and is not already shown
         if (![self.visibleViews objectForKey:key] && CGRectIntersectsRect(visibleRect, rect)) {
             // Only add views if not visible
             PSCollectionViewCell *newCell = [self.collectionViewDataSource collectionView:self cellForRowAtIndex:i];
-            newCell.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
+            newCell.frame = [[self.indexToRectMap objectForKey:key] CGRectValue];
             [self addSubview:newCell];
             
             // Setup gesture recognizer
-            if ([newCell.gestureRecognizers count] == 0) {
+            if (![self cellHasTapGesture:newCell]) {
                 PSCollectionViewTapGestureRecognizer *gr = [[PSCollectionViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)];
+                gr.numberOfTapsRequired = 1;
                 gr.delegate = self;
+                
+                // to avoid conflicts with other tap gestures with an higher number of taps
+                for (UITapGestureRecognizer *gesture in newCell.gestureRecognizers) {
+                    if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {
+                        if (gesture.numberOfTapsRequired > gr.numberOfTapsRequired) {
+                            [gr requireGestureRecognizerToFail:gesture];
+                        }
+                    }
+                }
+                
                 [newCell addGestureRecognizer:gr];
                 newCell.userInteractionEnabled = YES;
             }
@@ -391,7 +476,6 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     if ([view respondsToSelector:@selector(prepareForReuse)]) {
         [view performSelector:@selector(prepareForReuse)];
     }
-    view.frame = CGRectZero;
     
     NSString *identifier = NSStringFromClass([view class]);
     if (![self.reuseableViews objectForKey:identifier]) {
@@ -406,7 +490,14 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 #pragma mark - Gesture Recognizer
 
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
+
+    CGRect frame = gestureRecognizer.view.frame;
+    frame.origin.x = (int)frame.origin.x;
+    frame.origin.y = (int)frame.origin.y;
+    frame.size.width = (int)frame.size.width;
+    frame.size.height = (int)frame.size.height;
+    
+    NSValue *rectString = [NSValue valueWithCGRect:frame];
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
     NSString *key = [matchingKeys lastObject];
     if ([gestureRecognizer.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
@@ -418,17 +509,31 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    
     if (![gestureRecognizer isMemberOfClass:[PSCollectionViewTapGestureRecognizer class]]) return YES;
     
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
-    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
-    NSString *key = [matchingKeys lastObject];
+    BOOL shouldReceive = TRUE;
     
-    if ([touch.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
-        return YES;
-    } else {
-        return NO;
+    PSCollectionViewCell *cell = (PSCollectionViewCell*)gestureRecognizer.view;
+    if ([cell respondsToSelector:@selector(gestureEnabled)]) {
+        shouldReceive = [cell gestureEnabled];
     }
+    
+    return shouldReceive;
+}
+
+- (BOOL)cellHasTapGesture:(PSCollectionViewCell*)cell {
+    
+    BOOL hasTapGesture = FALSE;
+    
+    for (PSCollectionViewTapGestureRecognizer *gesture in cell.gestureRecognizers) {
+        if ([gesture isKindOfClass:[PSCollectionViewTapGestureRecognizer class]]) {
+            hasTapGesture = TRUE;
+            break;
+        }
+    }
+    
+    return hasTapGesture;
 }
 
 @end
