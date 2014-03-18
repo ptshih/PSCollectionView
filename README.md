@@ -33,54 +33,67 @@ How to use:
 ---
 Here's an example of creating an instance of PSCollectionView
 
-    self.collectionView = [[PSCollectionView alloc] initWithFrame:CGRectZero];
-    self.collectionView.delegate = self; // This is for UIScrollViewDelegate
-    self.collectionView.collectionViewDelegate = self;
-    self.collectionView.collectionViewDataSource = self;
-    self.collectionView.backgroundColor = [UIColor clearColor];
-    self.collectionView.autoresizingMask = ~UIViewAutoresizingNone;
+```objc
+self.collectionView = [[PSCollectionView alloc] initWithFrame:CGRectZero];
+self.collectionView.delegate = self; // This is for UIScrollViewDelegate
+self.collectionView.collectionViewDelegate = self;
+self.collectionView.collectionViewDataSource = self;
+self.collectionView.backgroundColor = [UIColor clearColor];
+self.collectionView.autoresizingMask = ~UIViewAutoresizingNone;
+```
 
 **Setting number of columns**
 
-    // Specify number of columns for both iPhone and iPad
-    if (isDeviceIPad()) {
-        self.collectionView.numColsPortrait = 3;
-        self.collectionView.numColsLandscape = 4;
-    } else {
-        self.collectionView.numColsPortrait = 1;
-        self.collectionView.numColsLandscape = 2;
-    }
+```objc
+// Specify number of columns for both iPhone and iPad
+if (isDeviceIPad()) {
+    self.collectionView.numColsPortrait = 3;
+    self.collectionView.numColsLandscape = 4;
+} else {
+    self.collectionView.numColsPortrait = 1;
+    self.collectionView.numColsLandscape = 2;
+}
+```
 
 **Add a header view**
 
-    UIView *headerView = ...
-    self.collectionView.headerView = headerView;
+```objc
+UIView *headerView = ...
+self.collectionView.headerView = headerView;
+```
 
 **Add a footer view**
 
-    UIView *footerView = ...
-    self.collectionView.footerView = footerView;
+```objc
+UIView *footerView = ...
+self.collectionView.footerView = footerView;
+```    
     
 **Reloading Data**
-    [self.collectionView reloadData];
+
+```objc
+[self.collectionView reloadData];
+```
 
 **Delegate and DataSource**
 
-    - (Class)collectionView:(PSCollectionView *)collectionView cellClassForRowAtIndex:(NSInteger)index {
-        return [PSCollectionViewCell class];
-    }
+```objc
+- (Class)collectionView:(PSCollectionView *)collectionView cellClassForRowAtIndex:(NSInteger)index {
+    return [PSCollectionViewCell class];
+}
 
-    - (NSInteger)numberOfRowsInCollectionView:(PSCollectionView *)collectionView {
-        return 0;
-    }
+- (NSInteger)numberOfRowsInCollectionView:(PSCollectionView *)collectionView {
+    return 0;
+}
 
-    - (UIView *)collectionView:(PSCollectionView *)collectionView cellForRowAtIndex:(NSInteger)index {
-        return nil;
-    }
+- (UIView *)collectionView:(PSCollectionView *)collectionView cellForRowAtIndex:(NSInteger)index {
+    return nil;
+}
 
-    - (CGFloat)collectionView:(PSCollectionView *)collectionView heightForRowAtIndex:(NSInteger)index {
-        return 0.0;
-    }
+- (CGFloat)collectionView:(PSCollectionView *)collectionView heightForRowAtIndex:(NSInteger)index {
+    return 0.0;
+}
+```
 
 License
 ---
