@@ -20,8 +20,7 @@ Want to see this code in a live app?
 ---
 I use this in my iPhone/iPad app, Lunchbox.
 
-<img src="http://a5.mzstatic.com/us/r1000/086/Purple/v4/b7/08/bb/b708bb3f-0775-67af-6765-e9f17e7384c4/mza_6463307710579208032.480x480-75.jpg" />
-
+![Screenshot](http://a5.mzstatic.com/us/r1000/086/Purple/v4/b7/08/bb/b708bb3f-0775-67af-6765-e9f17e7384c4/mza_6463307710579208032.480x480-75.jpg)
 
 ARC
 ---
