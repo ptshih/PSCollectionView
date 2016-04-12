@@ -84,7 +84,7 @@ Here's an example of creating an instance of PSCollectionView
 
 License
 ---
-Copyright (c) 2012 Peter Shih (http://petershih.com)
+Copyright (c) 2012 Peter Stone (https://www.impeterstone.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
