@@ -44,6 +44,10 @@
 @property (nonatomic, unsafe_unretained) id <PSCollectionViewDelegate> collectionViewDelegate;
 @property (nonatomic, unsafe_unretained) id <PSCollectionViewDataSource> collectionViewDataSource;
 
+@property (nonatomic, assign) CGFloat verticalMargin;
+@property (nonatomic, assign) CGFloat horizontalMargin;
+
+
 #pragma mark - Public Methods
 
 /**
