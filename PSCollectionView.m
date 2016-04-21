@@ -262,7 +262,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
             CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
             CGFloat colHeight = [self.collectionViewDataSource collectionView:self heightForRowAtIndex:i];
             
-            CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
+            CGRect viewRect = CGRectIntegral(CGRectMake(left, top, self.colWidth, colHeight));
             
             // Add to index rect map
             [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
